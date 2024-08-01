@@ -1,12 +1,11 @@
 from typing import Optional
 
 from bittensor.chain_data import AxonInfo
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 
 
 class Model(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class Axon(Model):
@@ -20,4 +19,4 @@ class Axon(Model):
 
 class TextPrompt(BaseModel):
     text: str
-    weight: Optional[float]
+    weight: Optional[float] = None
