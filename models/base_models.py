@@ -5,7 +5,7 @@ Keep it as SynapseNameBase / SynapseNameIncoming / SynapseNameOutgoing
 """
 
 from typing import List, Optional, Dict
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 
 from core import constants as cst, Task
@@ -33,7 +33,7 @@ class CapacityIncoming(BaseModel): ...
 
 
 class CapacityOutgoing(BaseModel):
-    capacities: Optional[Dict[Task, VolumeForTask]]
+    capacities: Optional[Dict[Task, VolumeForTask]] = None
 
 
 class CapacityBase(CapacityIncoming, CapacityOutgoing): ...
@@ -53,9 +53,7 @@ class ImageGenerationBase(BaseModel):
         default=utility_models.EngineEnum.PROTEUS.value,
         description="The engine to use for image generation",
     )
-
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class ImageResponseBase(BaseOutgoing):
@@ -109,9 +107,7 @@ class InpaintIncoming(BaseModel):
     text_prompts: List[dc.TextPrompt] = Field([], description="Prompts for the image generation", title="text_prompts")
 
     mask_image: Optional[str] = Field(None, description="The base64 encoded mask", title="mask_source")
-
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class InpaintOutgoing(ImageResponseBase): ...
@@ -132,9 +128,7 @@ class AvatarIncoming(BaseModel):
         ...,
         description="Random seed for generating the image. NOTE: THIS CANNOT BE SET, YOU MUST PASS IN 0, SORRY!",
     )
-
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class AvatarOutgoing(ImageResponseBase): ...
@@ -212,14 +206,7 @@ class ChatIncoming(BaseModel):
 
     # String as enums are really not playing nice with synapses
     model: str = Field(...)
-    # model: utility_models.ChatModels = Field(default=..., title="Model")
-
-    # @pydantic.validator("model", pre=True)
-    # def validate_enum_field(cls, field):
-    #     return utility_models.ChatModels(field)
-
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class ChatOutgoing(BaseModel): ...
