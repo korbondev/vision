@@ -289,6 +289,20 @@ class axon:
 
     """
 
+    def info(self) -> "bittensor.AxonInfo":
+        """Returns the axon info object associated with this axon."""
+        return bittensor.AxonInfo(
+            version=bittensor.__version_as_int__,
+            ip=self.external_ip,
+            ip_type=networking.ip_version(self.external_ip),
+            port=self.external_port,
+            hotkey=self.wallet.hotkey.ss58_address,
+            coldkey=self.wallet.coldkeypub.ss58_address,
+            protocol=4,
+            placeholder1=0,
+            placeholder2=0,
+        )
+
     def __init__(
         self,
         wallet: Optional["bittensor.wallet"] = None,
@@ -298,7 +312,7 @@ class axon:
         external_ip: Optional[str] = None,
         external_port: Optional[int] = None,
         max_workers: Optional[int] = None,
-    ):
+    ) -> "bittensor.axon":
         r"""Creates a new bittensor.Axon object from passed arguments.
         Args:
             config (:obj:`Optional[bittensor.config]`, `optional`):
@@ -376,20 +390,6 @@ class axon:
             return r
 
         self.attach(forward_fn=ping, verify_fn=None, blacklist_fn=None, priority_fn=None)
-
-    def info(self) -> "bittensor.AxonInfo":
-        """Returns the axon info object associated with this axon."""
-        return bittensor.AxonInfo(
-            version=bittensor.__version_as_int__,
-            ip=self.external_ip,
-            ip_type=networking.ip_version(self.external_ip),
-            port=self.external_port,
-            hotkey=self.wallet.hotkey.ss58_address,
-            coldkey=self.wallet.coldkeypub.ss58_address,
-            protocol=4,
-            placeholder1=0,
-            placeholder2=0,
-        )
 
     def attach(
         self,
@@ -794,8 +794,9 @@ class axon:
             The ``serve`` method is crucial for integrating the Axon into the Bittensor network, allowing it
             to start receiving and processing requests from other neurons.
         """
-        if subtensor is not None and hasattr(subtensor, "serve_axon"):
-            subtensor.serve_axon(netuid=netuid, axon=self)
+        if subtensor is None:
+            subtensor = bittensor.subtensor()
+        subtensor.serve_axon(netuid=netuid, axon=self)
         return self
 
     async def default_verify(self, synapse: bittensor.Synapse):
@@ -895,18 +896,11 @@ class axon:
 
 
 def create_error_response(synapse: bittensor.Synapse):
-    if synapse.axon is None:
-        return JSONResponse(
-            status_code=400,
-            headers=synapse.to_headers(),
-            content={"message": "Invalid request name"},
-        )
-    else:
-        return JSONResponse(
-            status_code=synapse.axon.status_code or 400,
-            headers=synapse.to_headers(),
-            content={"message": synapse.axon.status_message},
-        )
+    return JSONResponse(
+        status_code=int(synapse.axon.status_code),
+        headers=synapse.to_headers(),
+        content={"message": synapse.axon.status_message},
+    )
 
 
 def log_and_handle_error(
@@ -1038,14 +1032,9 @@ class AxonMiddleware(BaseHTTPMiddleware):
                 raise
 
             # Logs the start of the request processing
-            if synapse.dendrite is not None:
-                bittensor.logging.trace(
-                    f"axon     | <-- | {request.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port} | 200 | Success "
-                )
-            else:
-                bittensor.logging.trace(
-                    f"axon     | <-- | {request.headers.get('content-length', -1)} B | {synapse.name} | None | None | 200 | Success "
-                )
+            bittensor.logging.debug(
+                f"axon     | <-- | {request.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port} | 200 | Success "
+            )
 
             # Call the blacklist function
             await self.blacklist(synapse)
@@ -1081,18 +1070,9 @@ class AxonMiddleware(BaseHTTPMiddleware):
         finally:
             # Log the details of the processed synapse, including total size, name, hotkey, IP, port,
             # status code, and status message, using the debug level of the logger.
-            if synapse.dendrite is not None and synapse.axon is not None:
-                bittensor.logging.trace(
-                    f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message}"
-                )
-            elif synapse.axon is not None:
-                bittensor.logging.trace(
-                    f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | None | None | {synapse.axon.status_code} | {synapse.axon.status_message}"
-                )
-            else:
-                bittensor.logging.trace(
-                    f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | None | None | 200 | Success "
-                )
+            bittensor.logging.debug(
+                f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message}"
+            )
 
             # Return the response to the requester.
             return response
@@ -1369,21 +1349,10 @@ class AxonMiddleware(BaseHTTPMiddleware):
         Postprocessing is the last step in the request handling process, ensuring that the response is
         properly formatted and contains all necessary information.
         """
-
-        # This to be able to return a 429
-        # From old 6.9.3 code
-        """        if response.status_code is not None and str(response.status_code) == "429":
-            # here for bittensor reasons i dont understand :D
-            synapse.axon.status_code = "429"
-            synapse.axon.status_message = "Too Many Requests"
-        else:
-            synapse.axon.status_code = "200"
-            synapse.axon.status_message = "Success"
-        """
-
         if synapse.axon is None:
             synapse.axon = bittensor.TerminalInfo()
 
+        # This to be able to return a 429
         if synapse.axon.status_code is not None and str(synapse.axon.status_code) == "429":
             # here for bittensor reasons i dont understand :D
             #  ¯\_(ツ)_/¯
