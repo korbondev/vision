@@ -1,4 +1,4 @@
-from pydantic import field_validator, ConfigDict, BaseModel, Field, root_validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, model_validator
 from typing import Optional, List
 from models import utility_models
 import random
@@ -99,7 +99,7 @@ class TextToImageRequest(BaseModel):
             raise ValueError("Text prompts cannot be empty")
         return values
 
-    @root_validator
+    @model_validator
     def allowed_params_validator(cls, values):
         engine = values.get("engine")
         steps = values.get("steps")
@@ -151,7 +151,7 @@ class ImageToImageRequest(BaseModel):
             raise ValueError("Text prompts cannot be empty")
         return values
 
-    @root_validator
+    @model_validator
     def allowed_params_validator(cls, values):
         engine = values.get("engine")
         steps = values.get("steps")
@@ -244,7 +244,7 @@ class InpaintRequest(BaseModel):
 #             raise ValueError("Text prompts cannot be empty")
 #         return values
 
-#     @root_validator
+#     @model_validator
 #     def allowed_params_validator(cls, values):
 
 #         engine = values.get('engine')
