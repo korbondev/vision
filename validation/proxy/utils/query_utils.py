@@ -256,7 +256,7 @@ async def query_miner_no_stream(
 
 def _extract_response(resulting_synapse: base_models.BaseSynapse, outgoing_model: BaseModel) -> Optional[BaseModel]:
     try:
-        formatted_response = outgoing_model(**resulting_synapse.dict())
+        formatted_response = outgoing_model(**resulting_synapse.model_dump())
 
         # If we're expecting a result (i.e. not nsfw), then try to deserialize
         if (hasattr(formatted_response, "is_nsfw") and not formatted_response.is_nsfw) or not hasattr(

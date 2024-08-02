@@ -12,7 +12,7 @@ POST_ENDPOINT = "generate_text"
 async def stream_text_from_server(body: base_models.ChatIncoming, url: str, task: Task) -> AsyncGenerator:
     text_endpoint = url + POST_ENDPOINT
     async with httpx.AsyncClient(timeout=90) as client:  # noqa
-        async with client.stream("POST", text_endpoint, json=body.dict()) as resp:
+        async with client.stream("POST", text_endpoint, json=body.model_dump()) as resp:
             async for chunk in resp.aiter_lines():
                 try:
                     received_event_chunks = chunk.split("\n\n")

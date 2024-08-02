@@ -65,8 +65,8 @@ class DatabaseManager:
                 await self.conn.execute(sql.delete_oldest_rows_from_tasks(limit=10))
 
             data_to_store = {
-                "result": result.json(),
-                "synapse": json.dumps(synapse.dict()),
+                "result": result.model_dump_json(),
+                "synapse": json.dumps(synapse.model_dump()),
                 "synthetic_query": synthetic_query,
             }
             hotkey = result.miner_hotkey

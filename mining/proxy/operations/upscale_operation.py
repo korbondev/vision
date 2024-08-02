@@ -15,11 +15,11 @@ T = TypeVar("T", bound=bt.Synapse)
 class UpscaleOperation(abstract_operation.Operation):
     @staticmethod
     async def forward(synapse: synapses.Upscale) -> synapses.Upscale:
-        output = await upscale_logic.upscale_logic(base_models.UpscaleIncoming(**synapse.dict()))
+        output = await upscale_logic.upscale_logic(base_models.UpscaleIncoming(**synapse.model_dump()))
 
         synapse.image = None
 
-        output_dict = output.dict()
+        output_dict = output.model_dump()
         for field in output_dict:
             setattr(synapse, field, output_dict[field])
         return synapse

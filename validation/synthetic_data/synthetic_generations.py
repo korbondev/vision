@@ -119,7 +119,7 @@ class SyntheticDataManager:
                 control_strength=0.5,
                 ipadapter_strength=0.5,
                 init_image=_my_boy_postie(),
-            ).dict()
+            ).model_dump()
             self.task_to_stored_synthetic_data[task] = synthetic_data
         else:
             try:
