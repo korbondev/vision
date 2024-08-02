@@ -16,12 +16,12 @@ async def _get_clip_embeddings_from_server(body: BaseModel) -> ClipEmbeddingsRes
 
     try:
         async with httpx.AsyncClient(timeout=5) as client:  # noqa
-            response = await client.post(clip_endpoint, json=body.dict())
+            response = await client.post(clip_endpoint, json=body.model_dump())
     except httpx.HTTPStatusError as error:
         bt.logging.warning(
             f"Error getting an image; response {error.response.status_code} while making request to {clip_endpoint}: {error}"
         )
-        raise 
+        raise
     except httpx.RequestError as error:
         bt.logging.warning(
             f"Error getting an image; An error occurred while making request to {clip_endpoint}: {error}"

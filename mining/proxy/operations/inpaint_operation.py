@@ -15,12 +15,12 @@ T = TypeVar("T", bound=bt.Synapse)
 class InpaintOperation(abstract_operation.Operation):
     @staticmethod
     async def forward(synapse: synapses.Inpaint) -> synapses.Inpaint:
-        output = await inpaint_logic.inpaint_logic(base_models.InpaintIncoming(**synapse.dict()))
+        output = await inpaint_logic.inpaint_logic(base_models.InpaintIncoming(**synapse.model_dump()))
 
         synapse.init_image = None
         synapse.mask_image = None
 
-        output_dict = output.dict()
+        output_dict = output.model_dump()
         for field in output_dict:
             setattr(synapse, field, output_dict[field])
 

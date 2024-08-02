@@ -168,5 +168,5 @@ BASE_URL = "http://localhost:8001/"
 
 def test_clip():
     data = request_models.ClipEmbeddingsRequest(image_b64s=[init_image])
-    response = requests.post(BASE_URL + "clip-embeddings", json=data.dict(), headers=headers)
+    response = requests.post(BASE_URL + "clip-embeddings", json=data.model_dump(), headers=headers)
     assert response.status_code == 200

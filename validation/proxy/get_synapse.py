@@ -9,7 +9,7 @@ def get_synapse_from_body(
     body: BaseModel,
     synapse_model: Type[bt.Synapse],
 ) -> bt.Synapse:
-    body_dict = body.dict()
+    body_dict = body.model_dump()
     # I hate using the global var of core_validator as much as you hate reading it... gone in rewrite
     body_dict["seed"] = core_utils.get_seed(core_cst.SEED_CHUNK_SIZE, core_validator.validator_uid)
     synapse = synapse_model(**body_dict)
