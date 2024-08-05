@@ -2,21 +2,22 @@ import enum
 from typing import Dict, List, Optional, Any
 
 import numpy as np
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 import bittensor as bt
 
 from core import Task
 from validation.models import axon_uid
 
+
 class QueryResult(BaseModel):
-    formatted_response: Any
-    axon_uid: Optional[int]
-    miner_hotkey: Optional[str]
-    response_time: Optional[float]
-    error_message: Optional[str]
+    formatted_response: Any = None
+    axon_uid: Optional[int] = None
+    miner_hotkey: Optional[str] = None
+    response_time: Optional[float] = None
+    error_message: Optional[str] = None
     failed_axon_uids: List[int] = []
     task: Task
-    status_code: Optional[int]
+    status_code: Optional[int] = None
     success: bool
 
 
@@ -38,14 +39,11 @@ class Role(str, enum.Enum):
 class Message(BaseModel):
     role: Role = Role.user
     content: str = "Remind me that I have forgot to set the messages"
-
-    class Config:
-        extra = "allow"
+    model_config = ConfigDict(extra="allow")
 
 
 class UIDinfo(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     uid: axon_uid
     hotkey: str

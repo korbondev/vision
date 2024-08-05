@@ -15,11 +15,13 @@ T = TypeVar("T", bound=bt.Synapse)
 class ImageToImageOperation(abstract_operation.Operation):
     @staticmethod
     async def forward(synapse: synapses.ImageToImage) -> synapses.ImageToImage:
-        output = await image_to_image_logic.image_to_image_logic(base_models.ImageToImageIncoming(**synapse.dict()))
+        output = await image_to_image_logic.image_to_image_logic(
+            base_models.ImageToImageIncoming(**synapse.model_dump())
+        )
 
         synapse.init_image = None
 
-        output_dict = output.dict()
+        output_dict = output.model_dump()
         for field in output_dict:
             setattr(synapse, field, output_dict[field])
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, model_validator
 from typing import Optional, List
 from models import utility_models
 import random
@@ -75,9 +75,8 @@ class TextToImageRequest(BaseModel):
     text_prompts: List[dc.TextPrompt] = Field(..., description="Prompts for the image generation", title="text_prompts")
     height: Optional[int] = Field(cst.DEFAULT_HEIGHT, description="Height of the generated image", le=1344, ge=512)
     width: Optional[int] = Field(cst.DEFAULT_WIDTH, description="Width of the generated image", le=1344, ge=512)
-
-    class Config:
-        schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "examples": [
                 {
                     "text_prompts": [{"text": "A dog parachuting over the ocean"}],
@@ -88,17 +87,19 @@ class TextToImageRequest(BaseModel):
                     "cfg_scale": 2.0,
                 }
             ]
-        }
-        use_enum_values = True
-        extra = "forbid"
+        },
+        use_enum_values=True,
+        extra="forbid",
+    )
 
-    @validator("text_prompts")
+    @field_validator("text_prompts")
+    @classmethod
     def check_text_prompts_non_empty(cls, values):
         if not values:
             raise ValueError("Text prompts cannot be empty")
         return values
 
-    @root_validator
+    @model_validator
     def allowed_params_validator(cls, values):
         engine = values.get("engine")
         steps = values.get("steps")
@@ -127,8 +128,7 @@ class TextToImageRequest(BaseModel):
 class ImageToImageRequest(BaseModel):
     """Generate an image from another image (+ text)!"""
 
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
     cfg_scale: float = Field(cst.DEFAULT_CFG_SCALE, description="Scale for the configuration", le=10, ge=0.1)
     steps: int = Field(cst.DEFAULT_STEPS, description="Number of steps in the image generation process", le=50, ge=1)
@@ -144,13 +144,14 @@ class ImageToImageRequest(BaseModel):
     height: Optional[int] = Field(1024, description="Height of the generated image", le=1344, ge=512)
     width: Optional[int] = Field(1024, description="Width of the generated image", le=1344, ge=512)
 
-    @validator("text_prompts")
+    @field_validator("text_prompts")
+    @classmethod
     def check_text_prompts_non_empty(cls, values):
         if not values:
             raise ValueError("Text prompts cannot be empty")
         return values
 
-    @root_validator
+    @model_validator
     def allowed_params_validator(cls, values):
         engine = values.get("engine")
         steps = values.get("steps")
@@ -177,8 +178,7 @@ class ImageToImageRequest(BaseModel):
 
 
 class AvatarRequest(BaseModel):
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
     text_prompts: List[dc.TextPrompt] = Field(..., description="Prompts for the image generation", title="text_prompts")
     init_image: Optional[str] = Field(..., description="The base64 encoded image", title="image")
@@ -190,8 +190,7 @@ class AvatarRequest(BaseModel):
 
 
 class InpaintRequest(BaseModel):
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
     cfg_scale: float = Field(cst.DEFAULT_CFG_SCALE, description="Scale for the configuration")
     steps: int = Field(cst.DEFAULT_STEPS, description="Number of steps in the image generation process")
@@ -201,7 +200,8 @@ class InpaintRequest(BaseModel):
 
     mask_image: str = Field(None, description="The base64 encoded mask", title="mask_source")
 
-    @validator("text_prompts")
+    @field_validator("text_prompts")
+    @classmethod
     def check_text_prompts_non_empty(cls, values):
         if not values:
             raise ValueError("Text prompts cannot be empty")
@@ -244,7 +244,7 @@ class InpaintRequest(BaseModel):
 #             raise ValueError("Text prompts cannot be empty")
 #         return values
 
-#     @root_validator
+#     @model_validator
 #     def allowed_params_validator(cls, values):
 
 #         engine = values.get('engine')

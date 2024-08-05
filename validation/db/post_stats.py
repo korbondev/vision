@@ -109,7 +109,7 @@ class UidRecordPostObject(BaseModel):
     total_requests_made: int
     requests_429: int
     requests_500: int
-    period_score: Optional[float]
+    period_score: Optional[float] = None
 
     def dict(self):
         return {

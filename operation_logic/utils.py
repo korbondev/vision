@@ -287,7 +287,7 @@ async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: fl
     endpoint = miner_config.image_worker_url + post_endpoint
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            response = await client.post(endpoint, json=body.dict())
+            response = await client.post(endpoint, json=body.model_dump())
             response.raise_for_status()
 
             data = response.json()
