@@ -98,7 +98,7 @@ def _load_sse_jsons(chunk: str) -> Union[List[Dict[str, Any]], Dict[str, str]]:
             if "message" in loaded_chunk:
                 return {
                     "message": loaded_chunk["message"],
-                    "status_code": "429" if "bro" in loaded_chunk["message"] else "500",
+                    "status_code": 429 if "bro" in loaded_chunk["message"] else 500,  # pydantic warnings
                 }
         except json.JSONDecodeError:
             ...

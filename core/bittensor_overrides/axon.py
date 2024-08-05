@@ -1356,7 +1356,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         if synapse.axon.status_code is not None and str(synapse.axon.status_code) == "429":
             # here for bittensor reasons i dont understand :D
             #  ¯\_(ツ)_/¯
-            synapse.axon.status_code = "429"
+            synapse.axon.status_code = 429
             synapse.axon.status_message = "Too Many Requests"
 
         if synapse.axon.status_code is None:
