@@ -895,18 +895,11 @@ class axon:
 
 
 def create_error_response(synapse: bittensor.Synapse):
-    if synapse.axon is None:
-        return JSONResponse(
-            status_code=400,
-            headers=synapse.to_headers(),
-            content={"message": "Invalid request name"},
-        )
-    else:
-        return JSONResponse(
-            status_code=synapse.axon.status_code or 400,
-            headers=synapse.to_headers(),
-            content={"message": synapse.axon.status_message},
-        )
+    return JSONResponse(
+        status_code=int(synapse.axon.status_code),
+        headers=synapse.to_headers(),
+        content={"message": synapse.axon.status_message},
+    )
 
 
 def log_and_handle_error(synapse: bittensor.synapse, exception: Exception, status_code: int, start_time: int):
@@ -1047,19 +1040,10 @@ class AxonMiddleware(BaseHTTPMiddleware):
         # Logs the end of request processing and returns the response
         finally:
             # Log the details of the processed synapse, including total size, name, hotkey, IP, port,
-            # status code, and status message, using the debug level of the logger.
-            if synapse.dendrite is not None and synapse.axon is not None:
-                bittensor.logging.trace(
-                    f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message}"
-                )
-            elif synapse.axon is not None:
-                bittensor.logging.trace(
-                    f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | None | None | {synapse.axon.status_code} | {synapse.axon.status_message}"
-                )
-            else:
-                bittensor.logging.trace(
-                    f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | None | None | 200 | Success "
-                )
+            # status code, and status message, using the debug level of the logger...
+            bittensor.logging.debug(
+                f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message}"
+            )
 
             # Return the response to the requester.
             return response
