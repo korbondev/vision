@@ -3,6 +3,7 @@ import time
 from typing import Any, AsyncGenerator, List, Union
 
 import aiohttp
+from synapse import Synapse as bto_Synapse
 import bittensor
 
 
@@ -43,7 +44,7 @@ class dendrite(bittensor.dendrite):
             List[Union[bittensor.AxonInfo, bittensor.axon]],
             Union[bittensor.AxonInfo, bittensor.axon],
         ],
-        synapse: bittensor.Synapse = bittensor.Synapse(),
+        synapse: bittensor.Synapse = bto_Synapse(),
         connect_timeout: float = 1.5,
         response_timeout: float = 3,
         deserialize: bool = True,
@@ -160,7 +161,7 @@ class dendrite(bittensor.dendrite):
     async def call_stream(
         self,
         target_axon: Union[bittensor.AxonInfo, bittensor.axon],
-        synapse: bittensor.StreamingSynapse = bittensor.Synapse(),  # type: ignore
+        synapse: bittensor.StreamingSynapse = bto_Synapse(),  # type: ignore
         connect_timeout: float = 2.0,
         response_timeout: float = 3.0,
         deserialize: bool = True,
@@ -247,7 +248,7 @@ class dendrite(bittensor.dendrite):
     async def call(
         self,
         target_axon: Union[bittensor.AxonInfo, bittensor.axon],
-        synapse: bittensor.Synapse = bittensor.Synapse(),
+        synapse: bittensor.Synapse = bto_Synapse(),
         connect_timeout: float = 2.0,
         response_timeout: float = 3.0,
         deserialize: bool = True,
@@ -311,7 +312,7 @@ class dendrite(bittensor.dendrite):
                 self._log_incoming_response(synapse)
 
             # Log synapse event history
-            self.synapse_history.append(bittensor.Synapse.from_headers(synapse.to_headers()))
+            self.synapse_history.append(bto_Synapse.from_headers(synapse.to_headers()))
 
             # Return the updated synapse object after deserializing if requested
             if deserialize:
