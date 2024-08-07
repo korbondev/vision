@@ -3,6 +3,7 @@ import time
 import tracemalloc
 
 import bittensor as bt
+
 from core import utils, Task
 from mining.proxy import core_miner
 from config.miner_config import config
@@ -12,6 +13,12 @@ from mining.proxy import operations
 tracemalloc.start()
 
 if __name__ == "__main__":
+    bt.logging.on()
+    bt.logging.set_debug()
+    bt.logging.set_trace()
+
+    bt.logging.info("Starting miner with LOGGING ENABLEDDDDDDDDDDDDD :D ...")
+
     miner = core_miner.CoreMiner()
 
     bt.logging.info("Loading all config & resources....")
