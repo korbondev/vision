@@ -6,7 +6,7 @@ from core import Task
 from models import synapses, utility_models
 from typing import Dict, Optional
 import bittensor as bt
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 # I don't love this being here. How else should I do it though?
 # I don't want to rely on any extra third party service for fetching this info...
 
@@ -24,7 +24,7 @@ TASK_IS_STREAM: Dict[Task, bool] = {
     Task.clip_image_embeddings: False,
     Task.avatar: False,
 }
-TASKS_TO_SYNAPSE: Dict[Task, bt.Synapse] = {
+TASKS_TO_SYNAPSE: Dict[Task, bto_Synapse] = {
     Task.chat_mixtral: synapses.Chat,
     Task.chat_llama_3: synapses.Chat,
     Task.proteus_text_to_image: synapses.TextToImage,
@@ -39,7 +39,7 @@ TASKS_TO_SYNAPSE: Dict[Task, bt.Synapse] = {
 }
 
 
-def get_task_from_synapse(synapse: bt.Synapse) -> Optional[Task]:
+def get_task_from_synapse(synapse: bto_Synapse) -> Optional[Task]:
     if isinstance(synapse, synapses.Chat):
         if synapse.model == utility_models.ChatModels.mixtral.value:
             return Task.chat_mixtral

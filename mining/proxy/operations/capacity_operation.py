@@ -1,5 +1,5 @@
 from typing import Tuple, TypeVar
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 
 from core import utils
@@ -11,7 +11,7 @@ import copy
 
 operation_name = "CapacityOperation"
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 
 class CapacityOperation(abstract_operation.Operation):

@@ -1,5 +1,5 @@
 from typing import Tuple, TypeVar
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 
 from mining.proxy import core_miner
@@ -9,7 +9,7 @@ from operation_logic import avatar_logic
 
 operation_name = "AvatarOperation"
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 
 class AvatarOperation(abstract_operation.Operation):

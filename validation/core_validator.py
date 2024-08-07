@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 from typing import List
 from typing import Optional
 from typing import Set
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 from fastapi.responses import JSONResponse
 import httpx
 from pydantic import BaseModel
@@ -372,7 +372,7 @@ class CoreValidator:
             await asyncio.sleep(60)
 
     async def make_organic_query(
-        self, task: Task, stream: bool, outgoing_model: BaseModel, synapse: bt.Synapse
+        self, task: Task, stream: bool, outgoing_model: BaseModel, synapse: bto_Synapse
     ) -> JSONResponse:
         if self.uid_manager is None:
             return JSONResponse(status_code=500, content={"message": "Server booting, one sec"})

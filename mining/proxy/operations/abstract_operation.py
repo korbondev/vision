@@ -1,6 +1,6 @@
 import abc
 from typing import Any, Tuple, TypeVar
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 from fastapi.responses import JSONResponse
 
@@ -10,7 +10,7 @@ from mining.proxy.core_miner import miner_requests_stats
 from config.miner_config import config as miner_config
 from functools import wraps
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 # Make sure this matches the class name
 operation_name = "Operation"

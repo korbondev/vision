@@ -2,7 +2,7 @@ import asyncio
 import collections
 import random
 from typing import AsyncGenerator, Dict, List, Union
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from core import Task, bittensor_overrides as bto
@@ -183,7 +183,7 @@ class UidManager:
         bt.logging.info(f"Done synthetic querying for task: {task} and uid: {uid} and volume: {volume}")
 
     async def make_organic_query(
-        self, task: Task, stream: bool, synapse: bt.Synapse, outgoing_model: BaseModel
+        self, task: Task, stream: bool, synapse: bto_Synapse, outgoing_model: BaseModel
     ) -> Union[utility_models.QueryResult, AsyncGenerator]:  # noqa: F821
         if task not in self.task_to_uid_queue:
             task_q_to_log = {k.value: len(v.uid_map) for k, v in self.task_to_uid_queue.items()}

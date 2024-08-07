@@ -189,7 +189,7 @@ class axon:
 
         import bittensor
         # Define your custom synapse class
-        class MySyanpse( bittensor.Synapse ):
+        class MySyanpse( bto_Synapse ):
             input: int = 1
             output: int = None
 
@@ -375,7 +375,7 @@ class axon:
         self.app.add_middleware(self.middleware_cls, axon=self)
 
         # Attach default forward.
-        def ping(r: bittensor.Synapse) -> bittensor.Synapse:
+        def ping(r: bto_Synapse) -> bto_Synapse:
             return r
 
         self.attach(forward_fn=ping, verify_fn=None, blacklist_fn=None, priority_fn=None)
@@ -463,14 +463,10 @@ class axon:
         try:
             first_param = next(iter(forward_sig.parameters.values()))
         except StopIteration:
-            raise ValueError(
-                "The forward_fn first argument must be a subclass of bittensor.Synapse, but it has no arguments"
-            )
+            raise ValueError("The forward_fn first argument must be a subclass of bto_Synapse, but it has no arguments")
 
         param_class = first_param.annotation
-        assert issubclass(
-            param_class, bittensor.Synapse
-        ), "The first argument of forward_fn must inherit from bittensor.Synapse"
+        assert issubclass(param_class, bto_Synapse), "The first argument of forward_fn must inherit from bto_Synapse"
         request_name = param_class.__name__
 
         async def endpoint(*args, **kwargs):
@@ -801,7 +797,7 @@ class axon:
             subtensor.serve_axon(netuid=netuid, axon=self)
         return self
 
-    async def default_verify(self, synapse: bittensor.Synapse):
+    async def default_verify(self, synapse: bto_Synapse):
         """
         This method is used to verify the authenticity of a received message using a digital signature.
 
@@ -839,7 +835,7 @@ class axon:
                 cryptographic keys can participate in secure communication.
 
         Args:
-            synapse: bittensor.Synapse
+            synapse: bto_Synapse
                 bittensor request synapse.
 
         Raises:
@@ -897,7 +893,7 @@ class axon:
             raise SynapseDendriteNoneException(synapse=synapse)
 
 
-def create_error_response(synapse: bittensor.Synapse):
+def create_error_response(synapse: bto_Synapse):
     return JSONResponse(
         status_code=int(synapse.axon.status_code),
         headers=synapse.to_headers(),
@@ -991,7 +987,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
 
         try:
             # Set up the synapse from its headers.
-            synapse: bittensor.Synapse = await self.preprocess(request)
+            synapse: bto_Synapse = await self.preprocess(request)
 
             # Logs the start of the request processing
             bittensor.logging.debug(
@@ -1016,7 +1012,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         # Handle errors related to preprocess.
         except InvalidRequestNameError as e:
             if "synapse" not in locals():
-                synapse: bittensor.Synapse = bto_Synapse()
+                synapse: bto_Synapse = bto_Synapse()
             log_and_handle_error(synapse, e, 400, start_time)
             response = create_error_response(synapse)
 
@@ -1073,7 +1069,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
             # Return the response to the requester.
             return response
 
-    async def preprocess(self, request: Request) -> bittensor.Synapse:
+    async def preprocess(self, request: Request) -> bto_Synapse:
         """
         Performs the initial processing of the incoming request. This method is responsible for
         extracting relevant information from the request and setting up the Synapse object, which
@@ -1083,7 +1079,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
             request (Request): The incoming request to be preprocessed.
 
         Returns:
-            bittensor.Synapse: The Synapse object representing the preprocessed state of the request.
+            bto_Synapse: The Synapse object representing the preprocessed state of the request.
 
         The preprocessing involves:
 
@@ -1139,13 +1135,13 @@ class AxonMiddleware(BaseHTTPMiddleware):
         # Return the setup synapse.
         return synapse
 
-    async def verify(self, synapse: bittensor.Synapse):
+    async def verify(self, synapse: bto_Synapse):
         """
         Verifies the authenticity and integrity of the request. This method ensures that the incoming
         request meets the predefined security and validation criteria.
 
         Args:
-            synapse (bittensor.Synapse): The Synapse object representing the request.
+            synapse (bto_Synapse): The Synapse object representing the request.
 
         Raises:
             Exception: If the verification process fails due to unmet criteria or security concerns.
@@ -1188,7 +1184,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
                 # The error message includes the original exception message.
                 raise NotVerifiedException(f"Not Verified with error: {str(e)}", synapse=synapse)
 
-    async def blacklist(self, synapse: bittensor.Synapse):
+    async def blacklist(self, synapse: bto_Synapse):
         """
         Checks if the request should be blacklisted. This method ensures that requests from disallowed
         sources or with malicious intent are blocked from processing. This can be extremely useful for
@@ -1196,7 +1192,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         are prohibited from accessing certain resources.
 
         Args:
-            synapse (bittensor.Synapse): The Synapse object representing the request.
+            synapse (bto_Synapse): The Synapse object representing the request.
 
         Raises:
             Exception: If the request is found in the blacklist.
@@ -1236,13 +1232,13 @@ class AxonMiddleware(BaseHTTPMiddleware):
                 # We raise an exception to halt the process and return the error message to the requester.
                 raise BlacklistedException(f"Forbidden. Key is blacklisted: {reason}.", synapse=synapse)
 
-    async def priority(self, synapse: bittensor.Synapse):
+    async def priority(self, synapse: bto_Synapse):
         """
         Executes the priority function for the request. This method assesses and assigns a priority
         level to the request, determining its urgency and importance in the processing queue.
 
         Args:
-            synapse (bittensor.Synapse): The Synapse object representing the request.
+            synapse (bto_Synapse): The Synapse object representing the request.
 
         Raises:
             Exception: If the priority assessment process encounters issues, such as timeouts.
@@ -1297,7 +1293,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
 
     async def run(
         self,
-        synapse: bittensor.Synapse,
+        synapse: bto_Synapse,
         call_next: RequestResponseEndpoint,
         request: Request,
     ) -> Response:
@@ -1306,7 +1302,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         the next function in the middleware chain to process the request and generate a response.
 
         Args:
-            synapse (bittensor.Synapse): The Synapse object representing the request.
+            synapse (bto_Synapse): The Synapse object representing the request.
             call_next (RequestResponseEndpoint): The next function in the middleware chain to process requests.
             request (Request): The original HTTP request.
 
@@ -1331,12 +1327,12 @@ class AxonMiddleware(BaseHTTPMiddleware):
         return response
 
     @classmethod
-    async def synapse_to_response(cls, synapse: bittensor.Synapse, start_time: float) -> JSONResponse:
+    async def synapse_to_response(cls, synapse: bto_Synapse, start_time: float) -> JSONResponse:
         """
         Converts the Synapse object into a JSON response with HTTP headers.
 
         Args:
-            synapse (bittensor.Synapse): The Synapse object representing the request.
+            synapse (bto_Synapse): The Synapse object representing the request.
             start_time (float): The timestamp when the request processing started.
 
         Returns:

@@ -3,10 +3,11 @@ from validation.models import UIDRecord
 from validation.proxy import work_and_speed_functions
 from models import utility_models
 from validation.db.db_management import db_manager
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 
 
 async def adjust_uid_record_from_result(
-    query_result: utility_models.QueryResult, synapse: bt.Synapse, uid_record: UIDRecord, synthetic_query: bool
+    query_result: utility_models.QueryResult, synapse: bto_Synapse, uid_record: UIDRecord, synthetic_query: bool
 ) -> None:
     """This does a query, and returns either the finished image request"""
 

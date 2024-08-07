@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 
 from models import base_models
@@ -10,42 +10,42 @@ from core import Task
 from starlette.responses import StreamingResponse
 
 
-class Capacity(bt.Synapse, base_models.CapacityBase):
+class Capacity(bto_Synapse, base_models.CapacityBase):
     def deserialize(self) -> Optional[Dict[Task, base_models.VolumeForTask]]:
         return self.capacities
 
 
-class TextToImage(bt.Synapse, base_models.TextToImageBase):
+class TextToImage(bto_Synapse, base_models.TextToImageBase):
     def deserialize(self) -> Optional[List[str]]:
         return self.image_b64
 
 
-class ImageToImage(bt.Synapse, base_models.ImageToImageBase):
+class ImageToImage(bto_Synapse, base_models.ImageToImageBase):
     def deserialize(self) -> Optional[List[str]]:
         return self.image_b64
 
 
-class Inpaint(bt.Synapse, base_models.InpaintBase):
+class Inpaint(bto_Synapse, base_models.InpaintBase):
     def deserialize(self) -> Optional[List[str]]:
         return self.image_b64
 
 
-class Avatar(bt.Synapse, base_models.AvatarBase):
+class Avatar(bto_Synapse, base_models.AvatarBase):
     def deserialize(self) -> Optional[List[str]]:
         return self.image_b64
 
 
-# class Scribble(bt.Synapse, base_models.ScribbleBase):
+# class Scribble(bto_Synapse, base_models.ScribbleBase):
 #     def deserialize(self) -> Optional[List[str]]:
 #         return self.image_b64
 
 
-class Upscale(bt.Synapse, base_models.UpscaleBase):
+class Upscale(bto_Synapse, base_models.UpscaleBase):
     def deserialize(self) -> Optional[List[str]]:
         return self.image_b64
 
 
-class ClipEmbeddings(bt.Synapse, base_models.ClipEmbeddingsBase):
+class ClipEmbeddings(bto_Synapse, base_models.ClipEmbeddingsBase):
     def deserialize(self) -> Optional[List[List[float]]]:
         return self.clip_embeddings
 

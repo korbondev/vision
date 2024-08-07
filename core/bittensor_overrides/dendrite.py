@@ -45,14 +45,14 @@ class dendrite(bittensor.dendrite):
             List[Union[bittensor.AxonInfo, bittensor.axon]],
             Union[bittensor.AxonInfo, bittensor.axon],
         ],
-        synapse: bittensor.Synapse = bto_Synapse(),
+        synapse: bto_Synapse = bto_Synapse(),
         connect_timeout: float = 1.5,
         response_timeout: float = 3,
         deserialize: bool = True,
         run_async: bool = True,
         streaming: bool = False,
         log_requests_and_responses: bool = True,
-    ) -> List[Union[AsyncGenerator[Any, Any], bittensor.Synapse, bittensor.StreamingSynapse]]:
+    ) -> List[Union[AsyncGenerator[Any, Any], bto_Synapse, bittensor.StreamingSynapse]]:
         """
         Asynchronously sends requests to one or multiple Axons and collates their responses.
 
@@ -75,14 +75,14 @@ class dendrite(bittensor.dendrite):
         Args:
             axons (Union[List[Union['bittensor.AxonInfo', 'bittensor.axon']], Union['bittensor.AxonInfo', 'bittensor.axon']]):
                 The target Axons to send requests to. Can be a single Axon or a list of Axons.
-            synapse (bittensor.Synapse, optional): The Synapse object encapsulating the data. Defaults to a new bittensor.Synapse instance.
+            synapse (bto_Synapse, optional): The Synapse object encapsulating the data. Defaults to a new bto_Synapse instance.
             timeout (float, optional): Maximum duration to wait for a response from an Axon in seconds. Defaults to 12.0.
             deserialize (bool, optional): Determines if the received response should be deserialized. Defaults to True.
             run_async (bool, optional): If True, sends requests concurrently. Otherwise, sends requests sequentially. Defaults to True.
             streaming (bool, optional): Indicates if the response is expected to be in streaming format. Defaults to False.
 
         Returns:
-            Union[AsyncGenerator, bittensor.Synapse, List[bittensor.Synapse]]: If a single Axon is targeted, returns its response.
+            Union[AsyncGenerator, bto_Synapse, List[bto_Synapse]]: If a single Axon is targeted, returns its response.
             If multiple Axons are targeted, returns a list of their responses.
         """
         is_list = True
@@ -101,7 +101,7 @@ class dendrite(bittensor.dendrite):
 
         async def query_all_axons(
             is_stream: bool,
-        ) -> Union[AsyncGenerator[Any, Any], bittensor.Synapse, bittensor.StreamingSynapse]:
+        ) -> Union[AsyncGenerator[Any, Any], bto_Synapse, bittensor.StreamingSynapse]:
             """
             Handles requests for all axons, either in streaming or non-streaming mode.
 
@@ -114,7 +114,7 @@ class dendrite(bittensor.dendrite):
 
             async def single_axon_response(
                 target_axon: Union[bittensor.AxonInfo, bittensor.axon],
-            ) -> AsyncGenerator[Any, Any] | bittensor.Synapse | bittensor.StreamingSynapse:
+            ) -> AsyncGenerator[Any, Any] | bto_Synapse | bittensor.StreamingSynapse:
                 """
                 Retrieve response for a single axon, either in streaming or non-streaming mode.
 
@@ -178,13 +178,13 @@ class dendrite(bittensor.dendrite):
 
         Args:
             target_axon (Union['bittensor.AxonInfo', 'bittensor.axon']): The target Axon to send the request to.
-            synapse (bittensor.Synapse, optional): The Synapse object encapsulating the data. Defaults to a new bittensor.Synapse instance.
+            synapse (bto_Synapse, optional): The Synapse object encapsulating the data. Defaults to a new bto_Synapse instance.
             timeout (float, optional): Maximum duration to wait for a response (or a chunk of the response) from the Axon in seconds. Defaults to 12.0.
             deserialize (bool, optional): Determines if each received chunk should be deserialized. Defaults to True.
 
         Yields:
             object: Each yielded object contains a chunk of the arbitrary response data from the Axon.
-            bittensor.Synapse: After the AsyncGenerator has been exhausted, yields the final filled Synapse.
+            bto_Synapse: After the AsyncGenerator has been exhausted, yields the final filled Synapse.
         """
 
         # Record start time
@@ -238,7 +238,7 @@ class dendrite(bittensor.dendrite):
 
             # OVERRIDE: DISABLE THIS AS IT SEEMS LIKE ITS NEVER USED
             # Log synapse event history
-            # self.synapse_history.append(bittensor.Synapse.from_headers(synapse.to_headers()))
+            # self.synapse_history.append(bto_Synapse.from_headers(synapse.to_headers()))
 
             # OVERRIDE: DISABLE THIS AS I DONT NEED IT
             # if deserialize:
@@ -249,12 +249,12 @@ class dendrite(bittensor.dendrite):
     async def call(
         self,
         target_axon: Union[bittensor.AxonInfo, bittensor.axon],
-        synapse: bittensor.Synapse = bto_Synapse(),
+        synapse: bto_Synapse = bto_Synapse(),
         connect_timeout: float = 2.0,
         response_timeout: float = 3.0,
         deserialize: bool = True,
         log_requests_and_responses: bool = True,
-    ) -> bittensor.Synapse | Any:
+    ) -> bto_Synapse | Any:
         """
         Asynchronously sends a request to a specified Axon and processes the response.
 
@@ -264,12 +264,12 @@ class dendrite(bittensor.dendrite):
 
         Args:
             target_axon (Union['bittensor.AxonInfo', 'bittensor.axon']): The target Axon to send the request to.
-            synapse (bittensor.Synapse, optional): The Synapse object encapsulating the data. Defaults to a new bittensor.Synapse instance.
+            synapse (bto_Synapse, optional): The Synapse object encapsulating the data. Defaults to a new bto_Synapse instance.
             timeout (float, optional): Maximum duration to wait for a response from the Axon in seconds. Defaults to 12.0.
             deserialize (bool, optional): Determines if the received response should be deserialized. Defaults to True.
 
         Returns:
-            bittensor.Synapse: The Synapse object, updated with the response data from the Axon.
+            bto_Synapse: The Synapse object, updated with the response data from the Axon.
         """
 
         # Record start time
@@ -323,7 +323,7 @@ class dendrite(bittensor.dendrite):
 
     def _handle_request_errors(
         self,
-        synapse: bittensor.Synapse,
+        synapse: bto_Synapse,
         request_name: str,
         exception: Exception,
         connection_timeout: float,

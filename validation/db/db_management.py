@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import random
 import json
 from typing import List, Dict, Any, Optional, Union
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import aiosqlite
 from core import Task, constants as core_cst
 
@@ -38,7 +38,7 @@ class DatabaseManager:
         return row[0]
 
     async def potentially_store_result_in_sql_lite_db(
-        self, result: utility_models.QueryResult, task: Task, synapse: bt.Synapse, synthetic_query: bool
+        self, result: utility_models.QueryResult, task: Task, synapse: bto_Synapse, synthetic_query: bool
     ) -> None:
         if task not in self.task_weights:
             bt.logging.error(f"{task} not in task weights in db_manager")
@@ -55,7 +55,7 @@ class DatabaseManager:
                 await self.insert_task_results(task.value, result, synapse, synthetic_query)
 
     async def insert_task_results(
-        self, task: str, result: utility_models.QueryResult, synapse: bt.Synapse, synthetic_query: bool
+        self, task: str, result: utility_models.QueryResult, synapse: bto_Synapse, synthetic_query: bool
     ) -> None:
         async with db_lock:
             async with self.conn.execute(sql.select_count_of_rows_in_tasks()) as cursor:

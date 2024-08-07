@@ -5,6 +5,7 @@ import traceback
 from typing import Any, Callable, Dict, Optional, Tuple, TypeVar
 from core import bittensor_overrides as bto
 import bittensor as bt
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 
 # import base miner class which takes care of most of the boilerplate
 from config import configuration
@@ -12,7 +13,7 @@ from core import Task, constants as core_cst, utils
 from config.miner_config import config as miner_config
 
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 
 metagraph = None
@@ -118,7 +119,7 @@ class CoreMiner:
 
     def attach_to_axon(
         self,
-        forward: Callable[[Any], bt.Synapse],
+        forward: Callable[[Any], bto_Synapse],
         blacklist: Callable[[Any], Tuple[bool, str]],
         priority: Callable[[Any], Any],
     ) -> None:
