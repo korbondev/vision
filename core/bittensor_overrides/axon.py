@@ -43,6 +43,8 @@ from starlette.requests import Request
 from starlette.responses import Response
 from substrateinterface import Keypair
 
+from synapse import Synapse as bto_Synapse
+
 import bittensor
 from bittensor.errors import (
     InvalidRequestNameError,
@@ -1014,19 +1016,19 @@ class AxonMiddleware(BaseHTTPMiddleware):
         # Handle errors related to preprocess.
         except InvalidRequestNameError as e:
             if "synapse" not in locals():
-                synapse: bittensor.Synapse = bittensor.Synapse()
+                synapse: bittensor.Synapse = bto_Synapse()
             log_and_handle_error(synapse, e, 400, start_time)
             response = create_error_response(synapse)
 
         except SynapseParsingError as e:
             if "synapse" not in locals():
-                synapse = bittensor.Synapse()
+                synapse = bto_Synapse()
             log_and_handle_error(synapse, e, 400, start_time)
             response = create_error_response(synapse)
 
         except UnknownSynapseError as e:
             if "synapse" not in locals():
-                synapse = bittensor.Synapse()
+                synapse = bto_Synapse()
             log_and_handle_error(synapse, e, 404, start_time)
             response = create_error_response(synapse)
 
