@@ -205,13 +205,13 @@ class ChatIncoming(BaseModel):
     )
 
     # String as enums are really not playing nice with synapses
-    # model: str = Field(...)
-    # model_config = ConfigDict(use_enum_values=True)
-    model: utility_models.ChatModels = Field(default=..., title="Model")
+    model: str = Field(...)
+    model_config = ConfigDict(use_enum_values=True)
+    # model: utility_models.ChatModels = Field(default=..., title="Model")
 
-    @field_validator("model", mode="before")
-    def validate_enum_field(cls, field):
-        return utility_models.ChatModels(field)
+    # @field_validator("model", mode="before")
+    # def validate_enum_field(cls, field):
+    #     return utility_models.ChatModels(field)
 
 
 class ChatOutgoing(BaseModel): ...
