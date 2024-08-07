@@ -1,5 +1,6 @@
 from typing import Dict, List, Optional
 from core.bittensor_overrides.synapse import Synapse as bto_Synapse
+from core.bittensor_overrides.synapse import StreamingSynapse as bto_StreamingSynapse
 import bittensor as bt
 
 from models import base_models
@@ -50,7 +51,7 @@ class ClipEmbeddings(bto_Synapse, base_models.ClipEmbeddingsBase):
         return self.clip_embeddings
 
 
-class Chat(bt.StreamingSynapse, base_models.ChatBase):
+class Chat(bto_StreamingSynapse, base_models.ChatBase):
     def deserialize(self) -> Optional[Dict[str, str]]:
         return None
 

@@ -5,6 +5,7 @@ from typing import Any, AsyncGenerator, List, Union
 import aiohttp
 
 from core.bittensor_overrides.synapse import Synapse as bto_Synapse
+from core.bittensor_overrides.synapse import StreamingSynapse as bto_StreamingSynapse
 import bittensor
 
 
@@ -52,7 +53,7 @@ class dendrite(bittensor.dendrite):
         run_async: bool = True,
         streaming: bool = False,
         log_requests_and_responses: bool = True,
-    ) -> List[Union[AsyncGenerator[Any, Any], bto_Synapse, bittensor.StreamingSynapse]]:
+    ) -> List[Union[AsyncGenerator[Any, Any], bto_Synapse, bto_StreamingSynapse]]:
         """
         Asynchronously sends requests to one or multiple Axons and collates their responses.
 
@@ -92,7 +93,7 @@ class dendrite(bittensor.dendrite):
             axons = [axons]
 
         # Check if synapse is an instance of the StreamingSynapse class or if streaming flag is set.
-        is_streaming_subclass = issubclass(synapse.__class__, bittensor.StreamingSynapse)
+        is_streaming_subclass = issubclass(synapse.__class__, bto_StreamingSynapse)
         if streaming != is_streaming_subclass:
             bittensor.logging.warning(
                 f"Argument streaming is {streaming} while issubclass(synapse, StreamingSynapse) is {synapse.__class__.__name__}. This may cause unexpected behavior."
@@ -101,7 +102,7 @@ class dendrite(bittensor.dendrite):
 
         async def query_all_axons(
             is_stream: bool,
-        ) -> Union[AsyncGenerator[Any, Any], bto_Synapse, bittensor.StreamingSynapse]:
+        ) -> Union[AsyncGenerator[Any, Any], bto_Synapse, bto_StreamingSynapse]:
             """
             Handles requests for all axons, either in streaming or non-streaming mode.
 
@@ -114,7 +115,7 @@ class dendrite(bittensor.dendrite):
 
             async def single_axon_response(
                 target_axon: Union[bittensor.AxonInfo, bittensor.axon],
-            ) -> AsyncGenerator[Any, Any] | bto_Synapse | bittensor.StreamingSynapse:
+            ) -> AsyncGenerator[Any, Any] | bto_Synapse | bto_StreamingSynapse:
                 """
                 Retrieve response for a single axon, either in streaming or non-streaming mode.
 

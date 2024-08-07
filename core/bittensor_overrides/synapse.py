@@ -2,7 +2,7 @@ import base64
 import json
 import sys
 from typing import Any, ClassVar, Dict
-
+from abc import ABC
 
 import bittensor
 from bittensor import Synapse as bt_Synapse
@@ -95,3 +95,6 @@ class Synapse(bt_Synapse):
         headers["computed_body_hash"] = self.body_hash
 
         return headers
+
+
+class StreamingSynapse(Synapse, ABC): ...

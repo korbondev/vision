@@ -3,6 +3,7 @@ import collections
 import random
 from typing import AsyncGenerator, Dict, List, Union
 from core.bittensor_overrides.synapse import Synapse as bto_Synapse
+from core.bittensor_overrides.synapse import StreamingSynapse as bto_StreamingSynapse
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from core import Task, bittensor_overrides as bto
@@ -153,7 +154,7 @@ class UidManager:
             synthetic_data = await self.synthetic_data_manager.fetch_synthetic_data_for_task(task)
 
             synthetic_synapse = tasks.TASKS_TO_SYNAPSE[task](**synthetic_data)
-            stream = isinstance(synthetic_synapse, bt.StreamingSynapse)
+            stream = isinstance(synthetic_synapse, bto_StreamingSynapse)
             outgoing_model = getattr(base_models, synthetic_synapse.__class__.__name__ + core_cst.OUTGOING)
 
             if not stream:
