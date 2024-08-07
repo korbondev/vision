@@ -43,7 +43,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from substrateinterface import Keypair
 
-from synapse import Synapse as bto_Synapse
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 
 import bittensor
 from bittensor.errors import (

@@ -3,7 +3,8 @@ import time
 from typing import Any, AsyncGenerator, List, Union
 
 import aiohttp
-from synapse import Synapse as bto_Synapse
+
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor
 
 
