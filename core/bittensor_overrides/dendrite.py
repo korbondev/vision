@@ -215,10 +215,10 @@ class dendrite(bittensor.dendrite):
                     yield chunk
 
                 # OVERRIDE: DISABLE THIS AS I ALSO HAVE NO IDEA WHY WE EVEN NEED IT
-                # json_response = synapse.extract_response_json(response)
+                json_response = synapse.extract_response_json(response)
 
                 # OVERRIDE: DISABLE THIS AS WE DON'T NEED MOST OF IT
-                # self.process_server_response(response, json_response, synapse)
+                self.process_server_response(response, json_response, synapse)
 
                 # Keep this as useful for logging ?
                 synapse.dendrite.status_code = synapse.axon.status_code

@@ -11,6 +11,7 @@ from starlette.types import Send
 from functools import partial
 from models import utility_models
 from config.miner_config import config as miner_config
+import traceback
 
 operation_name = "ChatOperation"
 
@@ -37,22 +38,28 @@ async def _send_text(text_generator: AsyncIterator[bytes], send: Send):
 
     except Exception as e:
         bt.logging.error(e)
+        bt.logging.error(f"Error when calling _send_text: {traceback.format_exc()}")
 
 
 class ChatOperation(abstract_operation.Operation):
     @staticmethod
     @abstract_operation.enforce_concurrency_limits
     async def forward(synapse: synapses.Chat) -> synapses.Chat:
-        if synapse.model == utility_models.ChatModels.mixtral.value:
-            url = miner_config.mixtral_text_worker_url
-        elif synapse.model == utility_models.ChatModels.llama_3.value:
-            url = miner_config.llama_3_text_worker_url
-        else:
-            raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
-        task = tasks.get_task_from_synapse(synapse)
-        text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.model_dump()), url, task)
+        try:
+            if synapse.model == utility_models.ChatModels.mixtral.value:
+                url = miner_config.mixtral_text_worker_url
+            elif synapse.model == utility_models.ChatModels.llama_3.value:
+                url = miner_config.llama_3_text_worker_url
+            else:
+                raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
+            task = tasks.get_task_from_synapse(synapse)
+            text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.model_dump()), url, task)
 
-        text_streamer = partial(_send_text, text_generator)
+            text_streamer = partial(_send_text, text_generator)
+        except Exception as e:
+            bt.logging.error(e)
+            bt.logging.error(f"Error when calling ChatOperation.forward: {traceback.format_exc()}")
+            raise
         return synapse.create_streaming_response(text_streamer)
 
     @staticmethod
