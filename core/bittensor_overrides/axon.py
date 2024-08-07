@@ -45,6 +45,7 @@ from substrateinterface import Keypair
 
 from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 
+
 import bittensor
 from bittensor.errors import (
     InvalidRequestNameError,
