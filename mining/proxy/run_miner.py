@@ -14,6 +14,9 @@ from mining.proxy import operations
 tracemalloc.start()
 
 if __name__ == "__main__":
+    bt.logging.on()
+    bt.logging.set_debug()
+    bt.logging.set_trace()
     bt.logging.info(f"Starting miner on {dt.now().strftime('%A, %B %d, %Y %H:%M:%S')} ...")
 
     miner = core_miner.CoreMiner()
