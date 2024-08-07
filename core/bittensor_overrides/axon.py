@@ -462,7 +462,9 @@ class axon:
         request_class = forward_sig.parameters[list(forward_sig.parameters)[0]].annotation
 
         # Assert that the first argument of 'forward_fn' is a subclass of 'bittensor.Synapse'
-        assert issubclass(request_class, bto_Synapse), "The argument of forward_fn must inherit from bittensor.Synapse"
+        assert issubclass(
+            request_class, bittensor.Synapse
+        ), "The argument of forward_fn must inherit from bittensor.Synapse"
 
         # Obtain the class name of the first argument of 'forward_fn'
         request_name = forward_sig.parameters[list(forward_sig.parameters)[0]].annotation.__name__
