@@ -1,5 +1,6 @@
 import importlib
 import time
+from datetime import datetime as dt
 import tracemalloc
 
 import bittensor as bt
@@ -13,11 +14,7 @@ from mining.proxy import operations
 tracemalloc.start()
 
 if __name__ == "__main__":
-    bt.logging.on()
-    bt.logging.set_debug()
-    bt.logging.set_trace()
-
-    bt.logging.info("Starting miner with LOGGING ENABLEDDDDDDDDDDDDD :D ...")
+    bt.logging.info(f"Starting miner on {dt.now().strftime("%A, %B %d, %Y %H:%M:%S")} ...")
 
     miner = core_miner.CoreMiner()
 
