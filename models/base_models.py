@@ -5,7 +5,7 @@ Keep it as SynapseNameBase / SynapseNameIncoming / SynapseNameOutgoing
 """
 
 from typing import List, Optional, Dict
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field, field_validator
 
 
 from core import constants as cst, Task
@@ -205,8 +205,13 @@ class ChatIncoming(BaseModel):
     )
 
     # String as enums are really not playing nice with synapses
-    model: str = Field(...)
-    model_config = ConfigDict(use_enum_values=True)
+    # model: str = Field(...)
+    # model_config = ConfigDict(use_enum_values=True)
+    model: utility_models.ChatModels = Field(default=..., title="Model")
+
+    @field_validator("model", mode="before")
+    def validate_enum_field(cls, field):
+        return utility_models.ChatModels(field)
 
 
 class ChatOutgoing(BaseModel): ...

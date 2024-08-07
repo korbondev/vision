@@ -53,7 +53,8 @@ from bittensor.errors import (
     BlacklistedException,
     PriorityException,
     PostProcessException,
-    SynapseException,
+    RunException,
+    InternalServerError,
 )
 from bittensor.constants import ALLOWED_DELTA, V_7_2_0
 from bittensor.threadpool import PriorityThreadPoolExecutor
@@ -289,20 +290,6 @@ class axon:
 
     """
 
-    def info(self) -> "bittensor.AxonInfo":
-        """Returns the axon info object associated with this axon."""
-        return bittensor.AxonInfo(
-            version=bittensor.__version_as_int__,
-            ip=self.external_ip,
-            ip_type=networking.ip_version(self.external_ip),
-            port=self.external_port,
-            hotkey=self.wallet.hotkey.ss58_address,
-            coldkey=self.wallet.coldkeypub.ss58_address,
-            protocol=4,
-            placeholder1=0,
-            placeholder2=0,
-        )
-
     def __init__(
         self,
         wallet: Optional["bittensor.wallet"] = None,
@@ -312,7 +299,7 @@ class axon:
         external_ip: Optional[str] = None,
         external_port: Optional[int] = None,
         max_workers: Optional[int] = None,
-    ) -> "bittensor.axon":
+    ):
         r"""Creates a new bittensor.Axon object from passed arguments.
         Args:
             config (:obj:`Optional[bittensor.config]`, `optional`):
@@ -391,13 +378,27 @@ class axon:
 
         self.attach(forward_fn=ping, verify_fn=None, blacklist_fn=None, priority_fn=None)
 
+    def info(self) -> "bittensor.AxonInfo":
+        """Returns the axon info object associated with this axon."""
+        return bittensor.AxonInfo(
+            version=bittensor.__version_as_int__,
+            ip=self.external_ip,
+            ip_type=networking.ip_version(self.external_ip),
+            port=self.external_port,
+            hotkey=self.wallet.hotkey.ss58_address,
+            coldkey=self.wallet.coldkeypub.ss58_address,
+            protocol=4,
+            placeholder1=0,
+            placeholder2=0,
+        )
+
     def attach(
         self,
         forward_fn: Callable,
         blacklist_fn: Optional[Callable] = None,
         priority_fn: Optional[Callable] = None,
         verify_fn: Optional[Callable] = None,
-    ) -> "bittensor.axon":
+    ):
         """
 
         Attaches custom functions to the Axon server for handling incoming requests. This method enables
@@ -794,9 +795,8 @@ class axon:
             The ``serve`` method is crucial for integrating the Axon into the Bittensor network, allowing it
             to start receiving and processing requests from other neurons.
         """
-        if subtensor is None:
-            subtensor = bittensor.subtensor()
-        subtensor.serve_axon(netuid=netuid, axon=self)
+        if subtensor is not None and hasattr(subtensor, "serve_axon"):
+            subtensor.serve_axon(netuid=netuid, axon=self)
         return self
 
     async def default_verify(self, synapse: bittensor.Synapse):
@@ -903,58 +903,25 @@ def create_error_response(synapse: bittensor.Synapse):
     )
 
 
-def log_and_handle_error(
-    synapse: bittensor.Synapse,
-    exception: Exception,
-    status_code: typing.Optional[int] = None,
-    start_time: typing.Optional[float] = None,
-):
-    if isinstance(exception, SynapseException):
-        synapse = exception.synapse or synapse
-
-        bittensor.logging.trace(f"Forward handled exception: {exception}")
-    else:
-        bittensor.logging.trace(f"Forward exception: {traceback.format_exc()}")
-
-    if synapse.axon is None:
-        synapse.axon = bittensor.TerminalInfo()
+def log_and_handle_error(synapse: bittensor.synapse, exception: Exception, status_code: int, start_time: int):
+    # Display the traceback for user clarity.
+    bittensor.logging.trace(f"Forward exception: {traceback.format_exc()}")
 
     # Set the status code of the synapse to the given status code.
-    error_id = str(uuid.uuid4())
     error_type = exception.__class__.__name__
+    error_message = str(exception)
+    detailed_error_message = f"{error_type}: {error_message}"
 
     # Log the detailed error message for internal use
-    bittensor.logging.error(f"{error_type}#{error_id}: {exception}")
-
-    if not status_code and synapse.axon.status_code != 100:
-        status_code = synapse.axon.status_code
-    status_message = synapse.axon.status_message
-    if isinstance(exception, SynapseException):
-        if not status_code:
-            if isinstance(exception, PriorityException):
-                status_code = 503
-            elif isinstance(exception, UnknownSynapseError):
-                status_code = 404
-            elif isinstance(exception, BlacklistedException):
-                status_code = 403
-            elif isinstance(exception, NotVerifiedException):
-                status_code = 401
-            elif isinstance(exception, (InvalidRequestNameError, SynapseParsingError)):
-                status_code = 400
-            else:
-                status_code = 500
-        status_message = status_message or str(exception)
-    else:
-        status_code = status_code or 500
-        status_message = status_message or f"Internal Server Error #{error_id}"
+    bittensor.logging.error(detailed_error_message)
 
     # Set a user-friendly error message
-    synapse.axon.status_code = status_code
-    synapse.axon.status_message = status_message
+    if getattr(synapse, "axon", None) is not None:
+        synapse.axon.status_code = str(status_code)
+        synapse.axon.status_message = error_message
 
-    if start_time:
         # Calculate the processing time by subtracting the start time from the current time.
-        synapse.axon.process_time = str(time.time() - start_time)  # type: ignore
+        synapse.axon.process_time = str(time.time() - start_time)
 
     return synapse
 
@@ -991,7 +958,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.axon = axon
 
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Request:
         """
         Asynchronously processes incoming HTTP requests and returns the corresponding responses. This
         method acts as the central processing unit of the AxonMiddleware, handling each step in the
@@ -1022,14 +989,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
 
         try:
             # Set up the synapse from its headers.
-            try:
-                synapse: bittensor.Synapse = await self.preprocess(request)
-            except Exception as exc:
-                if isinstance(exc, SynapseException) and exc.synapse is not None:
-                    synapse = exc.synapse
-                else:
-                    synapse = bittensor.Synapse()
-                raise
+            synapse: bittensor.Synapse = await self.preprocess(request)
 
             # Logs the start of the request processing
             bittensor.logging.debug(
@@ -1048,22 +1008,56 @@ class AxonMiddleware(BaseHTTPMiddleware):
             # Call the run function
             response = await self.run(synapse, call_next, request)
 
+            # Call the postprocess function
+            response = await self.postprocess(synapse, response, start_time)
+
         # Handle errors related to preprocess.
         except InvalidRequestNameError as e:
-            if synapse.axon is None:
-                synapse.axon = bittensor.TerminalInfo()
-            synapse.axon.status_code = 400
-            synapse.axon.status_message = str(e)
-            synapse = log_and_handle_error(synapse, e, start_time=start_time)
+            if "synapse" not in locals():
+                synapse: bittensor.Synapse = bittensor.Synapse()
+            log_and_handle_error(synapse, e, 400, start_time)
             response = create_error_response(synapse)
-        except SynapseException as e:
-            synapse = e.synapse or synapse
-            synapse = log_and_handle_error(synapse, e, start_time=start_time)
+
+        except SynapseParsingError as e:
+            if "synapse" not in locals():
+                synapse = bittensor.Synapse()
+            log_and_handle_error(synapse, e, 400, start_time)
+            response = create_error_response(synapse)
+
+        except UnknownSynapseError as e:
+            if "synapse" not in locals():
+                synapse = bittensor.Synapse()
+            log_and_handle_error(synapse, e, 404, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to verify.
+        except NotVerifiedException as e:
+            log_and_handle_error(synapse, e, 401, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to blacklist.
+        except BlacklistedException as e:
+            log_and_handle_error(synapse, e, 403, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to priority.
+        except PriorityException as e:
+            log_and_handle_error(synapse, e, 503, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to run.
+        except RunException as e:
+            log_and_handle_error(synapse, e, 500, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to postprocess.
+        except PostProcessException as e:
+            log_and_handle_error(synapse, e, 500, start_time)
             response = create_error_response(synapse)
 
         # Handle all other errors.
         except Exception as e:
-            synapse = log_and_handle_error(synapse, e, start_time=start_time)
+            log_and_handle_error(synapse, InternalServerError(str(e)), 500, start_time)
             response = create_error_response(synapse)
 
         # Logs the end of request processing and returns the response
@@ -1351,13 +1345,6 @@ class AxonMiddleware(BaseHTTPMiddleware):
         """
         if synapse.axon is None:
             synapse.axon = bittensor.TerminalInfo()
-
-        # This to be able to return a 429
-        if synapse.axon.status_code is not None and str(synapse.axon.status_code) == "429":
-            # here for bittensor reasons i dont understand :D
-            #  ¯\_(ツ)_/¯
-            synapse.axon.status_code = "429"
-            synapse.axon.status_message = "Too Many Requests"
 
         if synapse.axon.status_code is None:
             synapse.axon.status_code = 200

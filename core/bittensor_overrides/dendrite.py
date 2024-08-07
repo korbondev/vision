@@ -215,10 +215,10 @@ class dendrite(bittensor.dendrite):
                     yield chunk
 
                 # OVERRIDE: DISABLE THIS AS I ALSO HAVE NO IDEA WHY WE EVEN NEED IT
-                # json_response = synapse.extract_response_json(response)
+                json_response = synapse.extract_response_json(response)
 
                 # OVERRIDE: DISABLE THIS AS WE DON'T NEED MOST OF IT
-                # self.process_server_response(response, json_response, synapse)
+                self.process_server_response(response, json_response, synapse)
 
                 # Keep this as useful for logging ?
                 synapse.dendrite.status_code = synapse.axon.status_code
@@ -342,17 +342,17 @@ class dendrite(bittensor.dendrite):
             This method updates the synapse object in-place.
         """
         if isinstance(exception, aiohttp.ClientConnectorError):
-            synapse.dendrite.status_code = "503"
+            synapse.dendrite.status_code = 503
             synapse.dendrite.status_message = (
                 f"Service at {synapse.axon.ip}:{str(synapse.axon.port)}/{request_name} unavailable."
             )
         elif isinstance(exception, asyncio.TimeoutError):
             if "Connection timeout" in str(exception):
-                synapse.dendrite.status_code = "408"
+                synapse.dendrite.status_code = 408
                 synapse.dendrite.status_message = f"Initial connection timeout after {connection_timeout} seconds."
             else:
-                synapse.dendrite.status_code = "408"
+                synapse.dendrite.status_code = 408
                 synapse.dendrite.status_message = f"Response timeout after {response_timeout} seconds."
         else:
-            synapse.dendrite.status_code = "422"
+            synapse.dendrite.status_code = 422
             synapse.dendrite.status_message = f"Failed to parse response object with error: {str(exception)}"
