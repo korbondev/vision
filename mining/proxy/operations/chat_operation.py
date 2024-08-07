@@ -1,5 +1,5 @@
 from typing import Tuple, TypeVar, AsyncIterator
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 
 from core import tasks
@@ -15,7 +15,7 @@ import traceback
 
 operation_name = "ChatOperation"
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 
 async def _send_text(text_generator: AsyncIterator[bytes], send: Send):

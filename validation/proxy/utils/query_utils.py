@@ -11,6 +11,7 @@ from core import bittensor_overrides as bto
 from collections import OrderedDict
 from validation.scoring import scoring_utils
 import json
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 
 
 class UIDQueue:
@@ -39,7 +40,7 @@ class UIDQueue:
 
 
 def get_formatted_response(
-    resulting_synapse: base_models.BaseSynapse, initial_synapse: bt.Synapse
+    resulting_synapse: base_models.BaseSynapse, initial_synapse: bto_Synapse
 ) -> Optional[BaseModel]:
     if resulting_synapse and resulting_synapse.dendrite.status_code == 200 and resulting_synapse != initial_synapse:
         formatted_response = _extract_response(resulting_synapse, initial_synapse)
@@ -52,7 +53,7 @@ async def query_individual_axon(
     dendrite: bt.dendrite,
     axon: bto.axon,
     axon_uid: int,
-    synapse: bt.Synapse,
+    synapse: bto_Synapse,
     deserialize: bool = False,
     log_requests_and_responses: bool = True,
 ) -> Tuple[base_models.BaseSynapse, float]:
@@ -123,7 +124,7 @@ def _get_formatted_payload(content: str, first_message: bool, add_finish_reason:
 
 async def query_miner_stream(
     uid_record: UIDRecord,
-    synapse: bt.Synapse,
+    synapse: bto_Synapse,
     outgoing_model: BaseModel,
     task: Task,
     dendrite: bto.dendrite,
@@ -185,7 +186,7 @@ async def query_miner_stream(
 
 
 def create_scoring_adjustment_task(
-    query_result: utility_models.QueryResult, synapse: bt.Synapse, uid_record: UIDRecord, synthetic_query: bool
+    query_result: utility_models.QueryResult, synapse: bto_Synapse, uid_record: UIDRecord, synthetic_query: bool
 ):
     asyncio.create_task(
         scoring_utils.adjust_uid_record_from_result(query_result, synapse, uid_record, synthetic_query=synthetic_query)
@@ -194,7 +195,7 @@ def create_scoring_adjustment_task(
 
 async def query_miner_no_stream(
     uid_record: UIDRecord,
-    synapse: bt.Synapse,
+    synapse: bto_Synapse,
     outgoing_model: BaseModel,
     task: Task,
     dendrite: bto.dendrite,
@@ -276,7 +277,7 @@ async def query_individual_axon_stream(
     dendrite: bt.dendrite,
     axon: bto.axon,
     axon_uid: int,
-    synapse: bt.Synapse,
+    synapse: bto_Synapse,
     deserialize: bool = False,
     log_requests_and_responses: bool = True,
 ):

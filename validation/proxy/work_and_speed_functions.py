@@ -1,7 +1,7 @@
 import json
 import math
 from typing import Dict, Any, List, Union
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 from core import Task
 from core import tasks
 from core.tasks import TaskConfig, TaskType
@@ -93,7 +93,7 @@ def calculate_speed_modifier(task: Task, result: Dict[str, Any], synapse: Dict[s
 
 
 def calculate_work(
-    task: Task, result: Union[utility_models.QueryResult, Dict[str, Any]], synapse: Union[Dict[str, Any], bt.Synapse]
+    task: Task, result: Union[utility_models.QueryResult, Dict[str, Any]], synapse: Union[Dict[str, Any], bto_Synapse]
 ) -> float:
     """Gets volume for the task that was executed"""
     config = tasks.get_task_config(task)

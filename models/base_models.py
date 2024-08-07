@@ -6,7 +6,7 @@ Keep it as SynapseNameBase / SynapseNameIncoming / SynapseNameOutgoing
 
 from typing import List, Optional, Dict
 from pydantic import ConfigDict, BaseModel, Field, field_validator
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 
 from core import constants as cst, Task
 from core import dataclasses as dc
@@ -18,7 +18,7 @@ class VolumeForTask(BaseModel):
     volume: float
 
 
-class BaseSynapse(bt.Synapse):
+class BaseSynapse(bto_Synapse):
     error_message: Optional[str] = Field(None)
 
 

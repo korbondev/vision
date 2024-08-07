@@ -1,5 +1,5 @@
 from typing import Tuple, TypeVar
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 
 from mining.proxy import core_miner
@@ -9,7 +9,7 @@ from operation_logic import upscale_logic
 
 operation_name = "UpscaleOperation"
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 
 class UpscaleOperation(abstract_operation.Operation):

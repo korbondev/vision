@@ -1,5 +1,5 @@
 from typing import Tuple, TypeVar
-
+from core.bittensor_overrides.synapse import Synapse as bto_Synapse
 import bittensor as bt
 
 from mining.proxy import core_miner
@@ -10,7 +10,7 @@ from operation_logic import clip_embeddings_logic
 # Make sure this matches the class name
 operation_name = "ClipEmbeddingsOperation"
 
-T = TypeVar("T", bound=bt.Synapse)
+T = TypeVar("T", bound=bto_Synapse)
 
 
 class ClipEmbeddingsOperation(abstract_operation.Operation):
