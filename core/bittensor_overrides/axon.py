@@ -357,11 +357,12 @@ class axon:
         self.nonces: Dict[str, int] = {}
 
         # Request default functions.
-        self.forward_class_types: Dict[str, List[Signature]] = {}
-        self.blacklist_fns: Dict[str, Optional[Callable]] = {}
-        self.priority_fns: Dict[str, Optional[Callable]] = {}
-        self.forward_fns: Dict[str, Optional[Callable]] = {}
-        self.verify_fns: Dict[str, Optional[Callable]] = {}
+        self.forward_class_types = {}
+        self.blacklist_fns = {}
+        self.priority_fns = {}
+        self.forward_fns = {}
+        self.verify_fns = {}
+        self.required_hash_fields = {}
 
         # Instantiate FastAPI
         self.app = FastAPI()
