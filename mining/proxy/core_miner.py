@@ -3,13 +3,13 @@ import threading
 import time
 import traceback
 from typing import Any, Callable, Dict, Optional, Tuple, TypeVar
+from core import bittensor_overrides as bto
 import bittensor as bt
 
 # import base miner class which takes care of most of the boilerplate
 from config import configuration
 from core import Task, constants as core_cst, utils
 from config.miner_config import config as miner_config
-from core import bittensor_overrides as bto
 
 
 T = TypeVar("T", bound=bt.Synapse)
