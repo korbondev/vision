@@ -53,7 +53,8 @@ from bittensor.errors import (
     BlacklistedException,
     PriorityException,
     PostProcessException,
-    SynapseException,
+    RunException,
+    InternalServerError,
 )
 from bittensor.constants import ALLOWED_DELTA, V_7_2_0
 from bittensor.threadpool import PriorityThreadPoolExecutor
@@ -957,7 +958,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
         self.axon = axon
 
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Request:
         """
         Asynchronously processes incoming HTTP requests and returns the corresponding responses. This
         method acts as the central processing unit of the AxonMiddleware, handling each step in the
@@ -988,24 +989,12 @@ class AxonMiddleware(BaseHTTPMiddleware):
 
         try:
             # Set up the synapse from its headers.
-            try:
-                synapse: bittensor.Synapse = await self.preprocess(request)
-            except Exception as exc:
-                if isinstance(exc, SynapseException) and exc.synapse is not None:
-                    synapse = exc.synapse
-                else:
-                    synapse = bittensor.Synapse()
-                raise
+            synapse: bittensor.Synapse = await self.preprocess(request)
 
             # Logs the start of the request processing
-            if synapse.dendrite is not None:
-                bittensor.logging.trace(
-                    f"axon     | <-- | {request.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port} | 200 | Success "
-                )
-            else:
-                bittensor.logging.trace(
-                    f"axon     | <-- | {request.headers.get('content-length', -1)} B | {synapse.name} | None | None | 200 | Success "
-                )
+            bittensor.logging.debug(
+                f"axon     | <-- | {request.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port} | 200 | Success "
+            )
 
             # Call the blacklist function
             await self.blacklist(synapse)
@@ -1019,28 +1008,62 @@ class AxonMiddleware(BaseHTTPMiddleware):
             # Call the run function
             response = await self.run(synapse, call_next, request)
 
+            # Call the postprocess function
+            response = await self.postprocess(synapse, response, start_time)
+
         # Handle errors related to preprocess.
         except InvalidRequestNameError as e:
-            if synapse.axon is None:
-                synapse.axon = bittensor.TerminalInfo()
-            synapse.axon.status_code = 400
-            synapse.axon.status_message = str(e)
-            synapse = log_and_handle_error(synapse, e, start_time=start_time)
+            if "synapse" not in locals():
+                synapse: bittensor.Synapse = bittensor.Synapse()
+            log_and_handle_error(synapse, e, 400, start_time)
             response = create_error_response(synapse)
-        except SynapseException as e:
-            synapse = e.synapse or synapse
-            synapse = log_and_handle_error(synapse, e, start_time=start_time)
+
+        except SynapseParsingError as e:
+            if "synapse" not in locals():
+                synapse = bittensor.Synapse()
+            log_and_handle_error(synapse, e, 400, start_time)
+            response = create_error_response(synapse)
+
+        except UnknownSynapseError as e:
+            if "synapse" not in locals():
+                synapse = bittensor.Synapse()
+            log_and_handle_error(synapse, e, 404, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to verify.
+        except NotVerifiedException as e:
+            log_and_handle_error(synapse, e, 401, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to blacklist.
+        except BlacklistedException as e:
+            log_and_handle_error(synapse, e, 403, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to priority.
+        except PriorityException as e:
+            log_and_handle_error(synapse, e, 503, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to run.
+        except RunException as e:
+            log_and_handle_error(synapse, e, 500, start_time)
+            response = create_error_response(synapse)
+
+        # Handle errors related to postprocess.
+        except PostProcessException as e:
+            log_and_handle_error(synapse, e, 500, start_time)
             response = create_error_response(synapse)
 
         # Handle all other errors.
         except Exception as e:
-            synapse = log_and_handle_error(synapse, e, start_time=start_time)
+            log_and_handle_error(synapse, InternalServerError(str(e)), 500, start_time)
             response = create_error_response(synapse)
 
         # Logs the end of request processing and returns the response
         finally:
             # Log the details of the processed synapse, including total size, name, hotkey, IP, port,
-            # status code, and status message, using the debug level of the logger...
+            # status code, and status message, using the debug level of the logger.
             bittensor.logging.debug(
                 f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message}"
             )
