@@ -1,6 +1,9 @@
 from typing import Type
 from pydantic import BaseModel
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from core import utils as core_utils, constants as core_cst
 from validation.core_validator import core_validator
 

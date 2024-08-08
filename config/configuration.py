@@ -1,6 +1,9 @@
 import argparse
 import pathlib
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 
 def check_config(config: "bt.Config") -> None:

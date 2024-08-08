@@ -17,6 +17,9 @@ from pydantic import BaseModel
 from config.miner_config import config as miner_config
 import httpx
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 
 def crop_images(image_array: List[Image.Image], width: int, height: int) -> List[Image.Image]:

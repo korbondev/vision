@@ -8,6 +8,9 @@ import aiosqlite
 from core import Task, constants as core_cst
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from models import utility_models
 from validation.db import sql

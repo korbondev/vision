@@ -3,6 +3,9 @@ import time
 import tracemalloc
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from core import utils, Task
 from mining.proxy import core_miner

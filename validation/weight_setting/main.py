@@ -4,6 +4,9 @@ import time
 from typing import Dict, List, Tuple, Union
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 import torch
 from core import Task
 from models import utility_models

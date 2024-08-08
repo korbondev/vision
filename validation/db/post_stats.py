@@ -5,6 +5,9 @@ import time
 from typing import Any, Dict, List, Optional, Union
 import httpx
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from pydantic import BaseModel
 from substrateinterface import Keypair
 

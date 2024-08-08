@@ -12,6 +12,9 @@ from core import constants as cst, Task
 from core import dataclasses as dc
 from models import utility_models
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 
 class VolumeForTask(BaseModel):

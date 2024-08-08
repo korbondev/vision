@@ -4,6 +4,9 @@ from typing import Optional
 from core import constants as core_cst
 import os
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 import argparse
 
 
@@ -30,9 +33,7 @@ class Config(BaseModel):
     wallet_name: str = os.getenv(core_cst.WALLET_NAME_PARAM, "default")
 
     subtensor_network: str = os.getenv(core_cst.SUBTENSOR_NETWORK_PARAM, "test")
-    subtensor_chainendpoint: Optional[str] = os.getenv(
-        core_cst.SUBTENSOR_CHAINENDPOINT_PARAM, None
-    )
+    subtensor_chainendpoint: Optional[str] = os.getenv(core_cst.SUBTENSOR_CHAINENDPOINT_PARAM, None)
 
     external_server_url: str = os.getenv(core_cst.EXTERNAL_SERVER_ADDRESS_PARAM, None)
 

@@ -30,9 +30,6 @@ from pydantic import (
     model_validator,
 )
 import bittensor
-from core.bittensor_overrides import synapse as bto_synapse
-
-bittensor.synapse = bto_synapse
 from typing import Optional, Any, Dict, ClassVar, Tuple
 
 

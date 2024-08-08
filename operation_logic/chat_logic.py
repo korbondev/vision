@@ -1,6 +1,9 @@
 from core import Task
 from models import base_models
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 import httpx
 import json
 from typing import AsyncGenerator

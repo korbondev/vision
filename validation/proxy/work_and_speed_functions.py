@@ -7,6 +7,9 @@ from core import tasks
 from core.tasks import TaskConfig, TaskType
 from models import base_models, utility_models
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 MAX_SPEED_BONUS = 1.6  # Adjust this value as needed
 BELOW_MEAN_EXPONENT = 0.25

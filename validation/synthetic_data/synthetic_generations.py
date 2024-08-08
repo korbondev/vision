@@ -8,6 +8,9 @@ from typing import Dict, Any
 from config.validator_config import config as validator_config
 from core import Task, tasks, constants as core_cst
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from core import dataclasses as dc
 from models import base_models
 from validation.proxy import validation_utils
