@@ -4,6 +4,9 @@ from typing import Any, AsyncGenerator, List, Union
 
 import aiohttp
 import bittensor
+from core.bittensor_overrides import synapse as bto_synapse
+
+bittensor.synapse = bto_synapse
 
 
 class dendrite(bittensor.dendrite):

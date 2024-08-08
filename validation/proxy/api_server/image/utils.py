@@ -1,6 +1,9 @@
 import fastapi
 from pydantic import BaseModel
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from fastapi import HTTPException
 from models import utility_models
 
@@ -13,7 +16,8 @@ class NSFWContentException(fastapi.HTTPException):
 def _do_nsfw_checks(formatted_response: BaseModel):
     if formatted_response is not None and formatted_response.is_nsfw:
         raise NSFWContentException()
-    
+
+
 def do_formatted_response_image_checks(formatted_response: BaseModel, result: utility_models.QueryResult):
     _do_nsfw_checks(formatted_response)
     if formatted_response is None or formatted_response.image_b64 is None:

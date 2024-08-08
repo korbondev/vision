@@ -15,6 +15,9 @@ from pydantic import BaseModel
 from core import Task
 from core import TASK_TO_MAX_CAPACITY
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from validation.synthetic_data.synthetic_generations import SyntheticDataManager
 from validation.proxy.utils import query_utils
 from core import bittensor_overrides as bto

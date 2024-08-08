@@ -1,4 +1,7 @@
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from validation.models import UIDRecord
 from validation.proxy import work_and_speed_functions
 from models import utility_models

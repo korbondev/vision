@@ -5,6 +5,9 @@ from pydantic import BaseModel, ValidationError
 from core import Task
 from models import base_models, utility_models
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from validation.proxy.utils import constants as cst
 from validation.models import UIDRecord, axon_uid
 from core import bittensor_overrides as bto

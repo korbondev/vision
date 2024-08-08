@@ -4,6 +4,9 @@ from collections import defaultdict
 from pydantic import ConfigDict, BaseModel, Field
 from core import Task
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from typing import Optional
 from datetime import datetime
 

@@ -44,6 +44,9 @@ from starlette.responses import Response
 from substrateinterface import Keypair
 
 import bittensor
+from core.bittensor_overrides import synapse as bto_synapse
+
+bittensor.synapse = bto_synapse
 from bittensor.errors import (
     InvalidRequestNameError,
     SynapseDendriteNoneException,

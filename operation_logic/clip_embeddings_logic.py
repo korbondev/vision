@@ -1,4 +1,7 @@
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 import httpx
 from models import base_models

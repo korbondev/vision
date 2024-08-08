@@ -5,6 +5,9 @@ from typing import Union
 from PIL import Image
 from rich.console import Console
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 import fastapi
 from fastapi import HTTPException
 import random
