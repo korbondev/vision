@@ -7,6 +7,7 @@ import httpx
 import bittensor as bt
 from pydantic import BaseModel
 from substrateinterface import Keypair
+import os
 
 from validation.models import RewardData
 
@@ -29,7 +30,7 @@ data_type_to_url = {
 
 # Turn off if you don't wanna post your validator info to tauvision
 
-POST_TO_TAUVISION = True
+POST_TO_TAUVISION = int(os.getenv('POST_TO_TAUVISION', True))
 
 
 def _sign_timestamp(keypair: Keypair, timestamp: float) -> str:
