@@ -52,6 +52,9 @@ from bittensor.errors import (
     PostProcessException,
     InternalServerError,
 )
+from config.miner_config import config as miner_config
+
+IS_TESTNET = miner_config.subtensor_network == "test"
 
 
 class FastAPIThreadedServer(uvicorn.Server):
@@ -875,7 +878,8 @@ class axon:
         if endpoint_key in self.nonces.keys():
             # Ensure the nonce increases.
             if synapse.dendrite.nonce <= self.nonces[endpoint_key]:
-                raise Exception("Nonce is too small")
+                if not IS_TESTNET:
+                    raise Exception("Nonce is too small")
 
         if not keypair.verify(message, synapse.dendrite.signature):
             raise Exception(f"Signature mismatch with {message} and {synapse.dendrite.signature}")
