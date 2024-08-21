@@ -43,10 +43,10 @@ class ChatOperation(abstract_operation.Operation):
     @staticmethod
     @abstract_operation.enforce_concurrency_limits
     async def forward(synapse: synapses.Chat) -> synapses.Chat:
-        if synapse.model == utility_models.ChatModels.mixtral.value:
-            url = miner_config.mixtral_text_worker_url
-        elif synapse.model == utility_models.ChatModels.llama_3.value:
-            url = miner_config.llama_3_text_worker_url
+        if synapse.model == utility_models.ChatModels.llama_3_1_8b.value:
+            url = miner_config.llama_3_1_8b_text_worker_url
+        elif synapse.model == utility_models.ChatModels.llama_3_1_70b.value:
+            url = miner_config.llama_3_1_70b_text_worker_url
         else:
             raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
         task = tasks.get_task_from_synapse(synapse)

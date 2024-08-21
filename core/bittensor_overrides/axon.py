@@ -197,12 +197,12 @@ class axon:
             assert synapse.input == 1
             ...
 
-        # Define a custom request blacklist fucntion
+        # Define a custom request blacklist function
         def blacklist_my_synapse( synapse: MySyanpse ) -> bool:
             # Apply custom blacklist
             return False ( if non blacklisted ) or True ( if blacklisted )
 
-        # Define a custom request priority fucntion
+        # Define a custom request priority function
         def prioritize_my_synape( synapse: MySyanpse ) -> float:
             # Apply custom priority
             return 1.0
@@ -609,7 +609,7 @@ class axon:
             parser.add_argument(
                 "--" + prefix_str + "axon.max_workers",
                 type=int,
-                help="""The maximum number connection handler threads working simultaneously on this endpoint. 
+                help="""The maximum number connection handler threads working simultaneously on this endpoint.
                         The grpc server distributes new worker threads to service requests up to this number.""",
                 default=default_axon_max_workers,
             )
@@ -1101,6 +1101,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
             raise SynapseParsingError(
                 f"Improperly formatted request. Could not parse headers {request.headers} into synapse of type {request_name}."
             )
+            synapse = request_synapse
         synapse.name = request_name
 
         # Fills the local axon information into the synapse.

@@ -79,14 +79,14 @@ MINER_PARAMETERS = {
         "message": "Image Worker URL: ",
         "process_function": optional_http_address_processing_func,
     },
-    core_cst.MIXTRAL_TEXT_WORKER_URL_PARAM: {
+    core_cst.LLAMA_3_1_8B_TEXT_WORKER_URL_PARAM: {
         "default": None,
-        "message": "Mixtral Text Worker URL: ",
+        "message": "llama-3-1-8b Text Worker URL: ",
         "process_function": optional_http_address_processing_func,
     },
-    core_cst.LLAMA_3_TEXT_WORKER_URL_PARAM: {
+    core_cst.LLAMA_3_1_70B_TEXT_WORKER_URL_PARAM: {
         "default": None,
-        "message": "Llama 3 Text Worker URL: ",
+        "message": "Llama 3-1-70b Text Worker URL: ",
         "process_function": optional_http_address_processing_func,
     },
 }

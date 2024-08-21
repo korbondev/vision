@@ -12,7 +12,8 @@ from validation.proxy import dependencies
 router = APIRouter()
 
 
-@router.post("/chat")
+@router.post("/v1/chat/completions")
+@router.post("/chat", include_in_schema=False)
 async def chat(
     body: request_models.ChatRequest,
     _: None = fastapi.Depends(dependencies.get_token),
@@ -22,10 +23,17 @@ async def chat(
         synapse_model=synapses.Chat,
     )
 
+    # First two for backwards compatibility
+
     if synapse.model == utility_models.ChatModels.mixtral.value:
         task = tasks.Task.chat_mixtral
     elif synapse.model == utility_models.ChatModels.llama_3.value:
         task = tasks.Task.chat_llama_3
+
+    elif synapse.model == utility_models.ChatModels.llama_3_1_8b.value:
+        task = tasks.Task.chat_llama_3_1_8b
+    elif synapse.model == utility_models.ChatModels.llama_3_1_70b.value:
+        task = tasks.Task.chat_llama_3_1_70b
     else:
         raise HTTPException(status_code=400, detail="Invalid model provided")
 

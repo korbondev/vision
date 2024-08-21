@@ -67,7 +67,7 @@ class Scorer:
 
     async def _score_results(self):
         min_tasks_to_start_scoring = (
-            cst.MINIMUM_TASKS_TO_START_SCORING if self.testnet else cst.MINIMUM_TASKS_TO_START_SCORING_TESTNET
+            cst.MINIMUM_TASKS_TO_START_SCORING if not self.testnet else cst.MINIMUM_TASKS_TO_START_SCORING_TESTNET
         )
         while True:
             tasks_and_number_of_results = await db_manager.get_tasks_and_number_of_results()

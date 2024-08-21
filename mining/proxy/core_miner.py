@@ -19,7 +19,7 @@ metagraph = None
 
 asyncio_lock: asyncio.Lock = asyncio.Lock()
 threading_lock: threading.Lock = threading.Lock()
-MIN_VALIDATOR_STAKE = 0 if miner_config.subtensor_network == "test" else 5000
+MIN_VALIDATOR_STAKE = 0  # Changed to 0 to accept all requests
 
 
 class MinerRequestsStatus:
@@ -50,6 +50,9 @@ miner_requests_stats = MinerRequestsStatus()
 
 
 def base_blacklist(synapse: T) -> Tuple[bool, str]:
+    # Disable blacklist
+    return False, synapse.dendrite.hotkey
+
     if synapse.dendrite.hotkey not in metagraph.hotkeys:
         bt.logging.trace(f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}")
         return True, synapse.dendrite.hotkey
@@ -66,7 +69,6 @@ def base_priority(synapse: T) -> float:
     """
     The priority function determines the order in which requests are handled.
     """
-
     return 1
 
 
@@ -99,7 +101,8 @@ class CoreMiner:
         self.thread: Optional[threading.Thread] = None
 
     def run(self):
-        self.validate_and_register_wallet()
+        # Removed the registration check
+        #self.validate_and_register_wallet()
         self.start_serving_axon()
 
         try:
@@ -125,6 +128,10 @@ class CoreMiner:
         self.axon.attach(forward_fn=forward, blacklist_fn=blacklist, priority_fn=priority)
 
     def validate_wallet_and_retrieve_uid(self) -> Optional[int]:
+        # Always return a default UID (e.g., 0) to allow running without registration
+        bt.logging.info("Running miner without registration check.")
+        return 0
+    
         if self.wallet.hotkey.ss58_address not in metagraph.hotkeys:
             bt.logging.error(
                 f"Your miner / validator in the wallet: {self.wallet}, is not registered to this subnet on chain connection: {self.subtensor}. Run btcli register and try again."
@@ -137,6 +144,9 @@ class CoreMiner:
             return my_hotkey_uid
 
     def validate_and_register_wallet(self) -> None:
+        # This method is now empty, registration check removed
+        return
+        
         if not self.subtensor.is_hotkey_registered(
             netuid=self.config.netuid,
             hotkey_ss58=self.wallet.hotkey.ss58_address,
@@ -151,7 +161,8 @@ class CoreMiner:
         bt.logging.info(
             f"Serving axon on network: {self.config.subtensor.chain_endpoint} with netuid: {self.config.netuid}"
         )
-        self.axon.serve(netuid=self.config.netuid, subtensor=self.subtensor)
+        # Removed the registration check from axon.serve
+        #self.axon.serve(netuid=self.config.netuid, subtensor=self.subtensor)
         bt.logging.info(f"Starting axon server on port: {self.config.axon.port}")
         self.axon.start()
 
