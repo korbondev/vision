@@ -15,31 +15,35 @@ def image_to_base64(filepath):
 load_dotenv()
 
 API_KEY = os.getenv("VALI_API_KEY")
+ORGANIC_ENDPOINT = os.getenv("VALI_ORGANIC_ENDPOINT")
 headers = {
     "Authorization": f"Bearer {API_KEY}",
 }
 init_image = image_to_base64("tests/assets/tall_man.webp")
 
-BASE_URL = "http://localhost:8001/"
+BASE_URL = ORGANIC_ENDPOINT
 # Tests are pretty manual, because bittensor :D (need miners)
 
 
-# def test_text_to_image():
-#     data = request_models.TextToImageRequest(
-#         engine=utility_models.EngineEnum.PROTEUS.value,
-#         cfg_scale=2.0,
-#         steps=10,
-#         text_prompts=[
-#             dc.TextPrompt(
-#                 text="Dog",
-#                 weight=1.0,
-#             )
-#         ],
-#         height=1280,
-#         width=1280,
-#     )
-#     response = requests.post(BASE_URL + "text-to-image", json=data.dict(), headers=headers)
-#     assert response.status_code == 200
+def test_text_to_image():
+    data = request_models.TextToImageRequest(
+        engine=utility_models.EngineEnum.PROTEUS.value,
+        cfg_scale=2.0,
+        steps=10,
+        text_prompts=[
+            dc.TextPrompt(
+                text="Dog",
+                weight=1.0,
+            )
+        ],
+        height=1280,
+        width=1280,
+    )
+    response = requests.post(BASE_URL + "text-to-image", json=data.dict(), headers=headers)
+    assert response.status_code == 200
+
+test_text_to_image()
+
 
 #     data = request_models.TextToImageRequest(
 #         engine=utility_models.EngineEnum.DREAMSHAPER.value,
@@ -166,7 +170,7 @@ BASE_URL = "http://localhost:8001/"
 #     assert response.status_code == 200, response.content
 
 
-def test_clip():
-    data = request_models.ClipEmbeddingsRequest(image_b64s=[init_image])
-    response = requests.post(BASE_URL + "clip-embeddings", json=data.dict(), headers=headers)
-    assert response.status_code == 200
+# def test_clip():
+#     data = request_models.ClipEmbeddingsRequest(image_b64s=[init_image])
+#     response = requests.post(BASE_URL + "clip-embeddings", json=data.dict(), headers=headers)
+#     assert response.status_code == 200
