@@ -407,7 +407,7 @@ class CoreValidator:
                 self.task_weights,
             )
 
-            await asyncio.sleep(60)
+            await asyncio.sleep(6)
 
     async def make_organic_query(
         self, task: Task, stream: bool, outgoing_model: BaseModel, synapse: bt.Synapse
