@@ -41,7 +41,7 @@ class DatabaseManager:
         self, result: utility_models.QueryResult, task: Task, synapse: bt.Synapse, synthetic_query: bool
     ) -> None:
         if task not in self.task_weights:
-            bt.logging.error(f"{task} not in task weights in db_manager")
+            bt.logging.error(f"{task} not in task weights")
             return
         target_percentage = self.task_weights[task]
         target_number_of_tasks_to_store = int(MAX_TASKS_IN_DB_STORE * target_percentage)

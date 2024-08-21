@@ -46,9 +46,8 @@ ENDPOINT_TO_CREDITS_USED = {
     "image-to-image": 1,
     "inpaint": 1,
     "scribble": 1,
-    "upscale": 1,
+    # "upscale": 1,
 }
-
 
 @app.middleware("http")
 async def api_key_validator(request: Request, call_next):

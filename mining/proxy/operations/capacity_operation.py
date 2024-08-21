@@ -17,11 +17,13 @@ T = TypeVar("T", bound=bt.Synapse)
 class CapacityOperation(abstract_operation.Operation):
     @staticmethod
     async def forward(synapse: synapses.Capacity) -> synapses.Capacity:
+        bt.logging.debug(f"Loading capacities for hotkey: {miner_config.hotkey_name}")
         capacity_config = utils.load_capacities(miner_config.hotkey_name)
         capacities_with_concurrencies = copy.deepcopy(capacity_config)
         for key in capacities_with_concurrencies:
             del capacities_with_concurrencies[key]["concurrency_group_id"]
 
+        bt.logging.info(f"Capacities: {capacities_with_concurrencies}")
         # raise error if task not in tasks?
         return synapses.Capacity(capacities=capacities_with_concurrencies)
 

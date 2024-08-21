@@ -23,7 +23,7 @@ A Validator consists of two parts:
 - Proxy API server
 - Orchestrator server
 
-The proxy server is the server which has your hotkey,  spins up the axon, allows you to sell your bandwidth, etc. 
+The proxy server is the server which has your hotkey,  spins up the axon, allows you to sell your bandwidth, etc.
 
 The Orchestrator performs the checking tasks, to make sure the miners are behaving 🫡
 
@@ -31,7 +31,7 @@ The Orchestrator performs the checking tasks, to make sure the miners are behavi
 
 ## Starting the Orchestrator server
 
-Currently, a bare metal GPU is necessary for validating the GPU models. Please see here for the full instructions!(https://github.com/namoray/vision-workers/blob/main/validator_orchestrator/README.md)
+Currently, a bare metal GPU is necessary for validating the GPU models. Please see here for the full instructions!(https://github.com/namoray/vision-workers/blob/main/validator_orchestrator/docs/README.md)
 
 Once this is done, make a note of the IP address of that machine, and the port the orchestrator is running on (the default is 6920, if you didn't change anything)
 
@@ -42,7 +42,7 @@ Get a CPU VM (Digital Ocean Droplet, OVH, Vultr, etc)  - make sure you have an o
 
 ## Setup steps
 
-Note: if you're using a provider such as vast, make sure you expose the necessary ports first, e.g.: https://docs.runpod.io/docs/expose-ports#:~:text=If%20your%20pod%20supports%20a,address%20to%20access%20your%20service. Follow the "Symmetrical port mapping" step :) 
+Note: if you're using a provider such as vast, make sure you expose the necessary ports first, e.g.: https://docs.runpod.io/docs/expose-ports#:~:text=If%20your%20pod%20supports%20a,address%20to%20access%20your%20service. Follow the "Symmetrical port mapping" step :)
 
 **Note: Runpod CPU's don't seem to be the best**
 
@@ -78,7 +78,7 @@ sudo apt-get install -y jq
 ### Install nano so you can edit the config easily
 sudo apt-get update
 sudo apt-get install nano
-``` 
+```
 
 ### Install python dependencies
 Make sure you have installed the correct python version (python 3.10). If you don't, try this:

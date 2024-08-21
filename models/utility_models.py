@@ -8,6 +8,7 @@ import bittensor as bt
 from core import Task
 from validation.models import axon_uid
 
+
 class QueryResult(BaseModel):
     formatted_response: Any
     axon_uid: Optional[int]
@@ -23,8 +24,10 @@ class QueryResult(BaseModel):
 class ChatModels(str, enum.Enum):
     """Model is used for the chat"""
 
+    llama_3_1_8b = "llama-3-1-8b"
     mixtral = "mixtral-8x7b"
     llama_3 = "llama-3"
+    llama_3_1_70b = "llama-3-1-70b"
 
 
 class Role(str, enum.Enum):
@@ -67,6 +70,7 @@ class EngineEnum(str, enum.Enum):
     DREAMSHAPER = "dreamshaper"
     PLAYGROUND = "playground"
     PROTEUS = "proteus"
+    FLUX = "flux-schnell"
 
 
 class ImageHashes(BaseModel):
