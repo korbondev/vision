@@ -272,11 +272,15 @@ class CoreValidator:
 
             for i in self.axon_indexes:
                 uid = self.uids[i]
+                print(f"Found a UID of {uid} at the axon index {i} !!!!")
+                bt.logging.info(f"Found a UID {uid} at axon index {i}!!!!")
                 self.uid_to_uid_info[uid] = utility_models.UIDinfo(
                     uid=uid,
                     axon=axons[i],
                     hotkey=hotkeys[i],
                 )
+            if not self.axon_indexes:
+                bt.logging.warning(" !!!!! NO AXONS FOUND ON METAGRAPH !!!!! ")
 
         bt.logging.info("Finished extraction - now to fetch the available capacities for each axon")
         await self.fetch_available_capacities_for_each_axon()
