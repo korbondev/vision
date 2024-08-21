@@ -13,7 +13,7 @@ for env_file in .*.env; do
             NETUID_OPTION="--netuid $netuid"
         fi
 
-        pm2 start validation/proxy/api_server/asgi.py --name validating_server_$hotkey --interpreter python -- --env_file $env_file $NETUID_OPTION
+        pm2 start validation/proxy/api_server/asgi.py --name validating_server_$hotkey --interpreter python -- --env_file $env_file $NETUID_OPTION --netuid 49 --subtensor.network test
     fi
 done
 
