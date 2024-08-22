@@ -1196,6 +1196,8 @@ class AxonMiddleware(BaseHTTPMiddleware):
         # that are prohibited from accessing certain resources.
         # We retrieve the blacklist checking function from the 'blacklist_fns' dictionary
         # that corresponds to the request's name (synapse name).
+        if IS_TESTNET:
+            return
         blacklist_fn = self.axon.blacklist_fns.get(synapse.name)
 
         # If a blacklist checking function exists for the request's name
