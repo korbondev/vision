@@ -7,9 +7,9 @@ from validation.db import constants as cst
 def insert_reward_data() -> str:
     return f"""
     INSERT INTO {cst.TABLE_REWARD_DATA} (
-        {cst.COLUMN_ID}, {cst.COLUMN_TASK}, {cst.COLUMN_AXON_UID}, 
-        {cst.COLUMN_QUALITY_SCORE}, {cst.COLUMN_VALIDATOR_HOTKEY}, 
-        {cst.COLUMN_MINER_HOTKEY}, {cst.COLUMN_SYNTHETIC_QUERY}, 
+        {cst.COLUMN_ID}, {cst.COLUMN_TASK}, {cst.COLUMN_AXON_UID},
+        {cst.COLUMN_QUALITY_SCORE}, {cst.COLUMN_VALIDATOR_HOTKEY},
+        {cst.COLUMN_MINER_HOTKEY}, {cst.COLUMN_SYNTHETIC_QUERY},
         {cst.COLUMN_SPEED_SCORING_FACTOR}, {cst.COLUMN_RESPONSE_TIME}, {cst.COLUMN_VOLUME}
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
@@ -18,8 +18,8 @@ def insert_reward_data() -> str:
 def insert_uid_record() -> str:
     return f"""
     INSERT INTO {cst.TABLE_UID_RECORDS} (
-        {cst.COLUMN_AXON_UID}, {cst.COLUMN_MINER_HOTKEY}, {cst.COLUMN_VALIDATOR_HOTKEY}, {cst.COLUMN_TASK}, 
-        {cst.COLUMN_DECLARED_VOLUME}, {cst.COLUMN_CONSUMED_VOLUME}, {cst.COLUMN_TOTAL_REQUESTS_MADE}, 
+        {cst.COLUMN_AXON_UID}, {cst.COLUMN_MINER_HOTKEY}, {cst.COLUMN_VALIDATOR_HOTKEY}, {cst.COLUMN_TASK},
+        {cst.COLUMN_DECLARED_VOLUME}, {cst.COLUMN_CONSUMED_VOLUME}, {cst.COLUMN_TOTAL_REQUESTS_MADE},
         {cst.COLUMN_REQUESTS_429}, {cst.COLUMN_REQUESTS_500}, {cst.COLUMN_PERIOD_SCORE}
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
@@ -70,7 +70,7 @@ def delete_uid_data_older_than() -> str:
 
 def delete_oldest_rows_from_tasks(limit: int = 10) -> str:
     return f"""
-    DELETE FROM {cst.TABLE_TASKS} 
+    DELETE FROM {cst.TABLE_TASKS}
     WHERE {cst.COLUMN_ID} IN (
         SELECT {cst.COLUMN_ID} FROM {cst.TABLE_TASKS} ORDER BY {cst.COLUMN_CREATED_AT} ASC LIMIT {limit}
     )
@@ -87,6 +87,16 @@ def delete_specific_task() -> str:
 def select_tasks_and_number_of_results() -> str:
     return f"""
     SELECT {cst.COLUMN_TASK_NAME}, COUNT(*) FROM {cst.TABLE_TASKS} GROUP BY {cst.COLUMN_TASK_NAME}
+    """
+
+def select_number_of_rewards_for_each_task() -> str:
+    return f"""
+    SELECT {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME},
+           COUNT({cst.TABLE_REWARD_DATA}.{cst.COLUMN_ID}) AS reward_count
+    FROM {cst.TABLE_TASKS}
+    LEFT JOIN {cst.TABLE_REWARD_DATA}
+    ON {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME} = {cst.TABLE_REWARD_DATA}.{cst.COLUMN_TASK}
+    GROUP BY {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME}
     """
 
 
