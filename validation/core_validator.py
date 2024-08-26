@@ -6,7 +6,6 @@ from typing import Dict, Tuple
 from typing import List
 from typing import Optional
 from typing import Set
-from datetime import date, datetime, time as dt_time
 from fastapi.responses import JSONResponse
 import httpx
 from pydantic import BaseModel
@@ -29,7 +28,7 @@ from validation.db import post_stats
 from validation.db.db_management import db_manager
 from core import constants as core_cst
 
-PROXY_VERSION = "4.0"
+PROXY_VERSION = "4.2.1"
 # Change this to not be hardcoded, once the orchestrator supports is
 ORCHESTRATOR_VERSION = "0.1.0"
 
@@ -124,55 +123,22 @@ class CoreValidator:
         self.uid_manager = None
 
     def _get_task_weights(self) -> Dict[Task, float]:
-        """
-        TODO: REMOVE ON NEXT DEPLOY AFTER 14TH OF AUGUST
-        """
-        now = datetime.now()
-        date_of_change = date(2024, 8, 14)
-        time_of_change = datetime.combine(date_of_change, dt_time(13, 0))
-
-        if now < time_of_change:
-            weights = {
-                Task.chat_mixtral: 0.1,
-                Task.chat_llama_3: 0.1,
-                Task.proteus_text_to_image: 0.2,
-                Task.playground_text_to_image: 0.1,
-                Task.dreamshaper_text_to_image: 0.05,
-                Task.proteus_image_to_image: 0.1,
-                Task.playground_image_to_image: 0.05,
-                Task.dreamshaper_image_to_image: 0.05,
-                Task.jugger_inpainting: 0.05,
-                Task.avatar: 0.2,
-                #
-                Task.chat_llama_3_1_8b: 0.0,
-                Task.chat_llama_3_1_70b: 0.0,
-                #
-                Task.flux_schnell_text_to_image: 0.0,
-                Task.flux_schnell_image_to_image: 0.0,
-            }
-        else:
-            weights = {
-                Task.chat_mixtral: 0,
-                Task.chat_llama_3: 0,
-                Task.playground_text_to_image: 0,
-                Task.playground_image_to_image: 0,
-                #
-                Task.chat_llama_3_1_8b: 0.15,
-                Task.chat_llama_3_1_70b: 0.20,
-                #
-                Task.proteus_text_to_image: 0.10,
-                Task.flux_schnell_text_to_image: 0.15,
-                Task.dreamshaper_text_to_image: 0.05,
-                #
-                Task.proteus_image_to_image: 0.05,
-                Task.flux_schnell_image_to_image: 0.05,
-                Task.dreamshaper_image_to_image: 0.05,
-                #
-                # Task.upscale: 0.1,
-                #
-                Task.jugger_inpainting: 0.05,
-                Task.avatar: 0.15,
-            }
+        weights = {
+            #
+            Task.chat_llama_3_1_8b: 0.15,
+            Task.chat_llama_3_1_70b: 0.20,
+            #
+            Task.proteus_text_to_image: 0.10,
+            Task.flux_schnell_text_to_image: 0.15,
+            Task.dreamshaper_text_to_image: 0.05,
+            #
+            Task.proteus_image_to_image: 0.05,
+            Task.flux_schnell_image_to_image: 0.05,
+            Task.dreamshaper_image_to_image: 0.05,
+            #
+            Task.jugger_inpainting: 0.05,
+            Task.avatar: 0.15,
+        }
 
         db_manager.task_weights = weights
         return weights
@@ -357,6 +323,7 @@ class CoreValidator:
         )
 
     async def run_vali(self) -> None:
+        await db_manager.delete_reward_data_after_update()
         iteration = 1
         while True:
             await post_stats.post_to_tauvision(
@@ -368,7 +335,7 @@ class CoreValidator:
                 data_type_to_post=post_stats.DataTypeToPost.VALIDATOR_INFO,
             )
 
-            await db_manager.delete_data_older_than_date(minutes=60 * 24 * 2)
+            await db_manager.delete_data_older_than_date(minutes=60 * 24)
             await db_manager.delete_tasks_older_than_date(minutes=120)
 
             # Wait for initial syncing of metagraph
