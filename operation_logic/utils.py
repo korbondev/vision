@@ -283,34 +283,36 @@ def model_to_printable_dict(model: Optional[BaseModel], max_length: int = 50) ->
             return value
 
 
+def map_endpoint(post_endpoint, engine):
+    endpoint_map = {
+        "avatar": 7212,
+        "inpaint": 7222,
+        ("proteus", "txt2img"): 7231,
+        ("proteus", "img2img"): 7232,
+        ("dreamshaper", "txt2img"): 7241,
+        ("dreamshaper", "img2img"): 7242,
+        ("flux-schnell", "txt2img"): 7251,
+        ("flux-schnell", "img2img"): 7252,
+        # ("",""): ,
+    }
+
+    if post_endpoint in ["avatar", "inpaint"]:
+        return f"http://127.0.0.1:{endpoint_map[post_endpoint]}/"
+
+    return f"http://127.0.0.1:{endpoint_map[(engine,post_endpoint)]}/"
+
+
 async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: float = 20.0):
     body_dict = body.dict()
 
     final_image_worker_url = miner_config.image_worker_url
-    if post_endpoint == "avatar":
-        final_image_worker_url = "http://127.0.0.1:7212/"
+    final_image_worker_url = map_endpoint(post_endpoint, body_dict.get("engine", ""))
 
-    elif post_endpoint == "inpaint":
-        final_image_worker_url = "http://127.0.0.1:7222/"
-
-    elif body_dict.get("engine") == "proteus" and post_endpoint == "txt2img":
-        final_image_worker_url = "http://127.0.0.1:7231/"
-    elif body_dict.get("engine") == "proteus" and post_endpoint == "img2img":
-        final_image_worker_url = "http://127.0.0.1:7232/"
-
-    elif body_dict.get("engine") == "dreamshaper" and post_endpoint == "txt2img":
-        final_image_worker_url = "http://127.0.0.1:7241/"
-    elif body_dict.get("engine") == "dreamshaper" and post_endpoint == "img2img":
-        final_image_worker_url = "http://127.0.0.1:7242/"
-
-    elif body_dict.get("engine") == "flux-schnell" and post_endpoint == "txt2img":
-        final_image_worker_url = "http://127.0.0.1:7251/"
-    elif body_dict.get("engine") == "flux-schnell" and post_endpoint == "img2img":
-        final_image_worker_url = "http://127.0.0.1:7252/"
+    endpoint = f"{final_image_worker_url}{post_endpoint}"
 
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            response = await client.post(f"{final_image_worker_url}{post_endpoint}", json=body_dict)
+            response = await client.post(endpoint, json=body_dict)
             response.raise_for_status()
 
             data = response.json()
