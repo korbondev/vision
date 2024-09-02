@@ -21,7 +21,7 @@
 import os
 import uuid
 import copy
-import json
+import ujson as json
 import time
 import asyncio
 import inspect

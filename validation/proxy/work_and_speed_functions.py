@@ -1,4 +1,4 @@
-import json
+import ujson as json
 import math
 from typing import Dict, Any, List, Union
 

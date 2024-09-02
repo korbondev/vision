@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 import random
-import json
+import ujson as json
 from typing import List, Dict, Any, Optional, Union
 
 import aiosqlite

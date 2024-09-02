@@ -11,7 +11,7 @@ from validation.proxy.utils import constants as cst
 import httpx
 from config.validator_config import config as validator_config
 from validation.proxy import work_and_speed_functions
-import json
+import ujson as json
 from validation.db.db_management import db_manager
 from validation.db import post_stats
 import os
