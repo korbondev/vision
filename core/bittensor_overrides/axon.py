@@ -53,6 +53,8 @@ from bittensor.errors import (
     InternalServerError,
 )
 from config.miner_config import config as miner_config
+from core.tasks import get_task_from_synapse
+
 
 IS_TESTNET = miner_config.subtensor_network == "test"
 
@@ -1059,7 +1061,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
             # status code, and status message, using the debug level of the logger.
 
             process_time = time.perf_counter() - precision_start_time
-            logging_sentence = f"{request.method} {request.url.path} took {process_time:.6f} seconds to run."
+            logging_sentence = f"{request.method} {request.url.path} took {process_time:.6f} seconds to run for '{get_task_from_synapse(synapse)}'!"
 
             bittensor.logging.debug(
                 f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message} || Custom message: {logging_sentence} "
