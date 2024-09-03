@@ -19,6 +19,19 @@ import httpx
 import bittensor as bt
 
 
+ENDPOINT_TO_PORT_MAP = {
+    "avatar": 7212,
+    "inpaint": 7222,
+    ("proteus", "txt2img"): 7231,
+    ("proteus", "img2img"): 7232,
+    ("dreamshaper", "txt2img"): 7241,
+    ("dreamshaper", "img2img"): 7242,
+    ("flux-schnell", "txt2img"): 7251,
+    ("flux-schnell", "img2img"): 7252,
+    # ("",""): ,
+}
+
+
 def crop_images(image_array: List[Image.Image], width: int, height: int) -> List[Image.Image]:
     cropped_images = []
     for image in image_array:
@@ -284,22 +297,10 @@ def model_to_printable_dict(model: Optional[BaseModel], max_length: int = 50) ->
 
 
 def map_endpoint(post_endpoint, engine):
-    endpoint_map = {
-        "avatar": 7212,
-        "inpaint": 7222,
-        ("proteus", "txt2img"): 7231,
-        ("proteus", "img2img"): 7232,
-        ("dreamshaper", "txt2img"): 7241,
-        ("dreamshaper", "img2img"): 7242,
-        ("flux-schnell", "txt2img"): 7251,
-        ("flux-schnell", "img2img"): 7252,
-        # ("",""): ,
-    }
-
     if post_endpoint in ["avatar", "inpaint"]:
-        return f"http://127.0.0.1:{endpoint_map[post_endpoint]}/"
+        return f"http://127.0.0.1:{ENDPOINT_TO_PORT_MAP[post_endpoint]}/"
 
-    return f"http://127.0.0.1:{endpoint_map[(engine,post_endpoint)]}/"
+    return f"http://127.0.0.1:{ENDPOINT_TO_PORT_MAP[(engine,post_endpoint)]}/"
 
 
 async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: float = 20.0):
