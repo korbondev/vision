@@ -1,6 +1,9 @@
 from typing import Tuple, TypeVar
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from mining.proxy import core_miner
 from mining.proxy.operations import abstract_operation
@@ -16,11 +19,13 @@ T = TypeVar("T", bound=bt.Synapse)
 class ClipEmbeddingsOperation(abstract_operation.Operation):
     @staticmethod
     async def forward(synapse: synapses.ClipEmbeddings) -> synapses.ClipEmbeddings:
-        output = await clip_embeddings_logic.clip_embeddings_logic(base_models.ClipEmbeddingsIncoming(**synapse.dict()))
+        output = await clip_embeddings_logic.clip_embeddings_logic(
+            base_models.ClipEmbeddingsIncoming(**synapse.model_dump())
+        )
 
         synapse.image_b64s = None
 
-        output_dict = output.dict()
+        output_dict = output.model_dump()
         for field in output_dict:
             setattr(synapse, field, output_dict[field])
 

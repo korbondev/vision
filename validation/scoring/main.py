@@ -4,6 +4,9 @@ import random
 from typing import Any, Dict
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 import substrateinterface
 from core import Task
 from validation.models import RewardData

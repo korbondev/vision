@@ -1,4 +1,7 @@
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from validation.models import UIDRecord
 from validation.proxy import work_and_speed_functions
 from models import utility_models
@@ -16,7 +19,7 @@ async def adjust_uid_record_from_result(
     # uid_record.synthetic_requests_still_to_make -= 1
 
     if query_result.status_code == 200 and query_result.success:
-        work = work_and_speed_functions.calculate_work(query_result.task, query_result, synapse=synapse.dict())
+        work = work_and_speed_functions.calculate_work(query_result.task, query_result, synapse=synapse.model_dump())
         uid_record.consumed_volume += work
 
         await db_manager.potentially_store_result_in_sql_lite_db(

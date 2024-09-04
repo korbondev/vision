@@ -1,6 +1,9 @@
 from typing import Tuple, TypeVar, AsyncIterator
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from core import tasks
 from mining.proxy import core_miner
@@ -11,6 +14,7 @@ from starlette.types import Send
 from functools import partial
 from models import utility_models
 from config.miner_config import config as miner_config
+import traceback
 
 operation_name = "ChatOperation"
 
@@ -37,22 +41,27 @@ async def _send_text(text_generator: AsyncIterator[bytes], send: Send):
 
     except Exception as e:
         bt.logging.error(e)
+        bt.logging.error(f"Error when calling _send_text: {traceback.format_exc()}")
 
 
 class ChatOperation(abstract_operation.Operation):
     @staticmethod
     @abstract_operation.enforce_concurrency_limits
     async def forward(synapse: synapses.Chat) -> synapses.Chat:
-        if synapse.model == utility_models.ChatModels.llama_3_1_8b.value:
-            url = miner_config.llama_3_1_8b_text_worker_url
-        elif synapse.model == utility_models.ChatModels.llama_3_1_70b.value:
-            url = miner_config.llama_3_1_70b_text_worker_url
-        else:
-            raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
-        task = tasks.get_task_from_synapse(synapse)
-        text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.dict()), url, task)
-
-        text_streamer = partial(_send_text, text_generator)
+        try:
+            if synapse.model == utility_models.ChatModels.llama_3_1_8b.value:
+                url = miner_config.llama_3_1_8b_text_worker_url
+            elif synapse.model == utility_models.ChatModels.llama_3_1_70b.value:
+                url = miner_config.llama_3_1_70b_text_worker_url
+            else:
+                raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
+            task = tasks.get_task_from_synapse(synapse)
+            text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.dict()), url, task)
+            text_streamer = partial(_send_text, text_generator)
+        except Exception as e:
+            bt.logging.error(e)
+            bt.logging.error(f"Error when calling ChatOperation.forward: {traceback.format_exc()}")
+            raise
         return synapse.create_streaming_response(text_streamer)
 
     @staticmethod

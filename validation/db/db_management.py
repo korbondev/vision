@@ -8,6 +8,9 @@ import aiosqlite
 from core import Task, constants as core_cst
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from models import utility_models
 from validation.db import sql
@@ -66,8 +69,8 @@ class DatabaseManager:
                 await self.conn.execute(sql.delete_oldest_rows_from_tasks(limit=10))
 
             data_to_store = {
-                "result": result.json(),
-                "synapse": json.dumps(synapse.dict()),
+                "result": result.model_dump_json(),
+                "synapse": json.dumps(synapse.model_dump()),
                 "synthetic_query": synthetic_query,
             }
             hotkey = result.miner_hotkey

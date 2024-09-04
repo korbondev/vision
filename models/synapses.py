@@ -1,6 +1,9 @@
 from typing import Dict, List, Optional
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from models import base_models
 

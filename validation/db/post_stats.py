@@ -5,6 +5,9 @@ import time
 from typing import Any, Dict, List, Optional, Union
 import httpx
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from pydantic import BaseModel
 from substrateinterface import Keypair
 
@@ -109,7 +112,7 @@ class UidRecordPostObject(BaseModel):
     total_requests_made: int
     requests_429: int
     requests_500: int
-    period_score: Optional[float]
+    period_score: Optional[float] = None
 
     def dict(self):
         return {

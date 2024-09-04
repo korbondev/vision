@@ -1,9 +1,12 @@
 from collections import defaultdict
 
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 from core import Task
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from typing import Optional
 from datetime import datetime
 
@@ -14,15 +17,13 @@ axon_uid = int
 
 class PeriodScore(BaseModel):
     hotkey: str
-    period_score: Optional[float]
+    period_score: Optional[float] = None
     consumed_volume: float
     created_at: datetime
 
 
 class UIDRecord(BaseModel):
-    class Config:
-        arbitrary_types_allowed = True
-        allow_mutation = True
+    model_config = ConfigDict(arbitrary_types_allowed=True, frozen=False)
 
     axon_uid: axon_uid
     hotkey: str
@@ -49,10 +50,9 @@ class UIDRecord(BaseModel):
         """
         if self.total_requests_made == 0 or self.declared_volume == 0:
             return None
-        
+
         self.declared_volume = max(self.declared_volume, 1)
         volume_unqueried = max(self.declared_volume - self.consumed_volume, 0)
-
 
         percentage_of_volume_unqueried = volume_unqueried / self.declared_volume
         percentage_of_429s = self.requests_429 / self.total_requests_made

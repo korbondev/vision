@@ -4,6 +4,9 @@ from typing import Optional
 from core import constants as core_cst
 import os
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 import argparse
 
 

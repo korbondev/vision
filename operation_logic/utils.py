@@ -17,6 +17,9 @@ from pydantic import BaseModel
 from config.miner_config import config as miner_config
 import httpx
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 
 ENDPOINT_TO_PORT_MAP = {
@@ -313,7 +316,7 @@ async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: fl
 
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            response = await client.post(endpoint, json=body_dict)
+            response = await client.post(endpoint, json=body.model_dump())
             response.raise_for_status()
 
             data = response.json()

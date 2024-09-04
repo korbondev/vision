@@ -4,6 +4,9 @@ from typing import Any, AsyncGenerator, List, Union
 
 import aiohttp
 import bittensor
+from core.bittensor_overrides import synapse as bto_synapse
+
+bittensor.synapse = bto_synapse
 
 
 class dendrite(bittensor.dendrite):
@@ -99,7 +102,7 @@ class dendrite(bittensor.dendrite):
 
         async def query_all_axons(
             is_stream: bool,
-        ) -> Any:
+        ) -> Union[AsyncGenerator[Any, Any], bittensor.Synapse, bittensor.StreamingSynapse]:
             """
             Handles requests for all axons, either in streaming or non-streaming mode.
 
@@ -126,7 +129,7 @@ class dendrite(bittensor.dendrite):
                     # If in streaming mode, return the async_generator
                     return self.call_stream(
                         target_axon=target_axon,
-                        synapse=synapse.copy(),
+                        synapse=synapse.model_copy(),  # type: ignore
                         connect_timeout=connect_timeout,
                         response_timeout=response_timeout,
                         deserialize=deserialize,
@@ -136,7 +139,7 @@ class dendrite(bittensor.dendrite):
                     # If not in streaming mode, simply call the axon and get the response.
                     return await self.call(
                         target_axon=target_axon,
-                        synapse=synapse.copy(),
+                        synapse=synapse.model_copy(),  # type: ignore
                         connect_timeout=connect_timeout,
                         response_timeout=response_timeout,
                         deserialize=deserialize,
@@ -160,7 +163,7 @@ class dendrite(bittensor.dendrite):
     async def call_stream(
         self,
         target_axon: Union[bittensor.AxonInfo, bittensor.axon],
-        synapse: bittensor.Synapse = bittensor.Synapse(),
+        synapse: bittensor.StreamingSynapse = bittensor.Synapse(),  # type: ignore
         connect_timeout: float = 2.0,
         response_timeout: float = 3.0,
         deserialize: bool = True,
@@ -207,7 +210,7 @@ class dendrite(bittensor.dendrite):
             async with (await self.session).post(
                 url,
                 headers=synapse.to_headers(),
-                json=synapse.dict(),
+                json=synapse.model_dump(),
                 timeout=timeout_settings,
             ) as response:
                 # Use synapse subclass' process_streaming_response method to yield the response chunks
@@ -215,10 +218,10 @@ class dendrite(bittensor.dendrite):
                     yield chunk
 
                 # OVERRIDE: DISABLE THIS AS I ALSO HAVE NO IDEA WHY WE EVEN NEED IT
-                # json_response = synapse.extract_response_json(response)
+                json_response = synapse.extract_response_json(response)
 
                 # OVERRIDE: DISABLE THIS AS WE DON'T NEED MOST OF IT
-                # self.process_server_response(response, json_response, synapse)
+                self.process_server_response(response, json_response, synapse)
 
                 # Keep this as useful for logging ?
                 synapse.dendrite.status_code = synapse.axon.status_code
@@ -242,7 +245,7 @@ class dendrite(bittensor.dendrite):
             # if deserialize:
             #     yield synapse.deserialize()
             # else:
-            # yield synapse
+            #     yield synapse
 
     async def call(
         self,
@@ -292,7 +295,7 @@ class dendrite(bittensor.dendrite):
             async with (await self.session).post(
                 url,
                 headers=synapse.to_headers(),
-                json=synapse.dict(),
+                json=synapse.model_dump(),
                 timeout=timeout_settings,
             ) as response:
                 # Extract the JSON response from the server
@@ -327,18 +330,32 @@ class dendrite(bittensor.dendrite):
         connection_timeout: float,
         response_timeout: float,
     ) -> None:
+        """
+        Handles exceptions that occur during network requests, updating the synapse with appropriate status codes and messages.
+
+        This method interprets different types of exceptions and sets the corresponding status code and
+        message in the synapse object. It covers common network errors such as connection issues and timeouts.
+
+        Args:
+            synapse: The synapse object associated with the request.
+            request_name: The name of the request during which the exception occurred.
+            exception: The exception object caught during the request.
+
+        Note:
+            This method updates the synapse object in-place.
+        """
         if isinstance(exception, aiohttp.ClientConnectorError):
-            synapse.dendrite.status_code = "503"
+            synapse.dendrite.status_code = 503
             synapse.dendrite.status_message = (
                 f"Service at {synapse.axon.ip}:{str(synapse.axon.port)}/{request_name} unavailable."
             )
         elif isinstance(exception, asyncio.TimeoutError):
             if "Connection timeout" in str(exception):
-                synapse.dendrite.status_code = "408"
+                synapse.dendrite.status_code = 408
                 synapse.dendrite.status_message = f"Initial connection timeout after {connection_timeout} seconds."
             else:
-                synapse.dendrite.status_code = "408"
+                synapse.dendrite.status_code = 408
                 synapse.dendrite.status_message = f"Response timeout after {response_timeout} seconds."
         else:
-            synapse.dendrite.status_code = "422"
+            synapse.dendrite.status_code = 422
             synapse.dendrite.status_message = f"Failed to parse response object with error: {str(exception)}"

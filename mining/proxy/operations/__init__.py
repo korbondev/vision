@@ -1,7 +1,7 @@
 from typing import Any, Dict
 from core import Task
 from . import capacity_operation  # noqa
-from . import chat_operation  # noqa
+from . import chat_operation
 from . import text_to_image_operation  # noqa
 from . import image_to_image_operation  # noqa
 from . import upscale_operation  # noqa

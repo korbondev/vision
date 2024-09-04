@@ -7,6 +7,9 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from core import Task, bittensor_overrides as bto
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from validation.models import UIDRecord, axon_uid
 from validation.synthetic_data import synthetic_generations
 from core import tasks, constants as core_cst

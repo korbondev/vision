@@ -2,6 +2,9 @@ import abc
 from typing import Any, Tuple, TypeVar
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from fastapi.responses import JSONResponse
 
 from core import tasks, utils
@@ -48,8 +51,8 @@ def enforce_concurrency_limits(func):
             bt.logging.warning(
                 f"Task can't be found from the synapse. Synapse model: {getattr(synapse, 'model', None)}. synapse engine: {getattr(synapse, 'engine', None)}"
             )
-            synapse.axon.status_code = "429"
-            synapse.dendrite.status_code = "429"
+            synapse.axon.status_code = 429
+            synapse.dendrite.status_code = 429
             return JSONResponse(
                 status_code=int(synapse.axon.status_code),
                 headers=synapse.to_headers(),
@@ -63,8 +66,8 @@ def enforce_concurrency_limits(func):
                 f"Concurrency groups: {concurrency_groups}."
                 f"Available tasks: {list(capacity_config.keys())}. "
             )
-            synapse.axon.status_code = "429"
-            synapse.dendrite.status_code = "429"
+            synapse.axon.status_code = 429
+            synapse.dendrite.status_code = 429
             return JSONResponse(
                 status_code=int(synapse.axon.status_code),
                 headers=synapse.to_headers(),
@@ -83,10 +86,10 @@ def enforce_concurrency_limits(func):
                     current_number_of_concurrent_requests + 1
                 )
             else:
-                synapse.axon.status_code = "429"
+                synapse.axon.status_code = 429
                 synapse.axon.status_message = "Enhance your calm bro"
                 synapse.dendrite.status_message = "Enhance your calm bro"
-                synapse.dendrite.status_code = "429"
+                synapse.dendrite.status_code = 429
                 return JSONResponse(
                     status_code=synapse.axon.status_code,
                     content={"message": "Enhance your calm bro"},

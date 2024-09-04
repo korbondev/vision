@@ -1,8 +1,9 @@
-
-
 from operation_logic import utils as operation_utils
 from models import base_models
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 MAX_PIX_COUNT = 4194304
 POST_ENDPOINT = "upscale"

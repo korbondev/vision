@@ -1,6 +1,9 @@
 from typing import Tuple, TypeVar
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from core import utils
 from mining.proxy import core_miner

@@ -5,6 +5,9 @@ from pydantic import BaseModel, ValidationError
 from core import Task
 from models import base_models, utility_models
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 from validation.proxy.utils import constants as cst
 from validation.models import UIDRecord, axon_uid
 from core import bittensor_overrides as bto
@@ -98,7 +101,7 @@ def _load_sse_jsons(chunk: str) -> Union[List[Dict[str, Any]], Dict[str, str]]:
             if "message" in loaded_chunk:
                 return {
                     "message": loaded_chunk["message"],
-                    "status_code": "429" if "bro" in loaded_chunk["message"] else "500",
+                    "status_code": 429 if "bro" in loaded_chunk["message"] else 500,  # pydantic warnings
                 }
         except json.JSONDecodeError:
             ...
@@ -256,7 +259,7 @@ async def query_miner_no_stream(
 
 def _extract_response(resulting_synapse: base_models.BaseSynapse, outgoing_model: BaseModel) -> Optional[BaseModel]:
     try:
-        formatted_response = outgoing_model(**resulting_synapse.dict())
+        formatted_response = outgoing_model(**resulting_synapse.model_dump())
 
         # If we're expecting a result (i.e. not nsfw), then try to deserialize
         if (hasattr(formatted_response, "is_nsfw") and not formatted_response.is_nsfw) or not hasattr(

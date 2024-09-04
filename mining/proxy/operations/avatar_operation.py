@@ -1,6 +1,9 @@
 from typing import Tuple, TypeVar
 
 import bittensor as bt
+from core.bittensor_overrides import synapse as bto_synapse
+
+bt.synapse = bto_synapse
 
 from mining.proxy import core_miner
 from mining.proxy.operations import abstract_operation
@@ -15,11 +18,11 @@ T = TypeVar("T", bound=bt.Synapse)
 class AvatarOperation(abstract_operation.Operation):
     @staticmethod
     async def forward(synapse: synapses.Avatar) -> synapses.Avatar:
-        output = await avatar_logic.avatar_logic(base_models.AvatarIncoming(**synapse.dict()))
+        output = await avatar_logic.avatar_logic(base_models.AvatarIncoming(**synapse.model_dump()))
 
         synapse.init_image = None
 
-        output_dict = output.dict()
+        output_dict = output.model_dump()
         for field in output_dict:
             setattr(synapse, field, output_dict[field])
 
