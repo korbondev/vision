@@ -31,7 +31,7 @@ from validation.db import post_stats
 from validation.db.db_management import db_manager
 from core import constants as core_cst
 
-PROXY_VERSION = "4.2.1"
+PROXY_VERSION = "4.2.2"
 # Change this to not be hardcoded, once the orchestrator supports is
 ORCHESTRATOR_VERSION = "0.1.0"
 

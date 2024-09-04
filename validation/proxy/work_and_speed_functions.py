@@ -12,7 +12,6 @@ from core.bittensor_overrides import synapse as bto_synapse
 bt.synapse = bto_synapse
 
 MAX_SPEED_BONUS = 1.6  # Adjust this value as needed
-BELOW_MEAN_EXPONENT = 0.25
 CHARACTER_TO_TOKEN_CONVERSION = 4.0
 
 

@@ -145,11 +145,11 @@ class DatabaseManager:
 
     async def delete_reward_data_after_update(self) -> None:
         """
-        Delete anything before 26th august 2pm UTC
+        Delete anything before 4th September 6am UTC
 
-        TODO: REMOVE AFTER NEXT UPDATE
+        TODO: REMOVE AFTER VISION 5.0
         """
-        cutoff_time = datetime(2024, 8, 26, 2, 0, 0)
+        cutoff_time = datetime(2024, 9, 4, 6, 0, 0)
         cutoff_time_str = cutoff_time.strftime("%Y-%m-%d %H:%M:%S")
 
         async with db_lock:

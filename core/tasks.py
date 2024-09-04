@@ -121,17 +121,16 @@ class TaskConfig(BaseModel):
 
 
 TASK_CONFIGS = [
-    # TaskConfig(task=Task.upscale, overhead=0.5, mean=0.80, variance=1, task_type=TaskType.UPSCALE),
-    TaskConfig(task=Task.chat_llama_3_1_70b, overhead=0.3, mean=0.018, variance=130, task_type=TaskType.TEXT),
-    TaskConfig(task=Task.chat_llama_3_1_8b, overhead=0.2, mean=0.009, variance=200, task_type=TaskType.TEXT),
-    TaskConfig(task=Task.proteus_image_to_image, overhead=0.6, mean=0.24, variance=5, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.proteus_text_to_image, overhead=0.25, mean=0.2, variance=7, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.flux_schnell_text_to_image, overhead=0.4, mean=0.30, variance=7, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.flux_schnell_image_to_image, overhead=0.6, mean=0.36, variance=5, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.avatar, overhead=0.5, mean=0.50, variance=4, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.dreamshaper_text_to_image, overhead=0.3, mean=0.22, variance=7, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.dreamshaper_image_to_image, overhead=0.6, mean=0.28, variance=5, task_type=TaskType.IMAGE),
-    TaskConfig(task=Task.jugger_inpainting, overhead=0.4, mean=0.3, variance=4, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.chat_llama_3_1_70b, overhead=0.3, mean=0.009, variance=416, task_type=TaskType.TEXT),
+    TaskConfig(task=Task.chat_llama_3_1_8b, overhead=0.2, mean=0.005, variance=520, task_type=TaskType.TEXT),
+    TaskConfig(task=Task.proteus_image_to_image, overhead=0.6, mean=0.10, variance=9, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.proteus_text_to_image, overhead=0.25, mean=0.16, variance=10, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.flux_schnell_text_to_image, overhead=0.4, mean=0.18, variance=18, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.flux_schnell_image_to_image, overhead=0.6, mean=0.20, variance=13, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.avatar, overhead=0.45, mean=0.24, variance=10, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.dreamshaper_text_to_image, overhead=0.3, mean=0.12, variance=18, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.dreamshaper_image_to_image, overhead=0.6, mean=0.13, variance=13, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.jugger_inpainting, overhead=0.4, mean=0.14, variance=10, task_type=TaskType.IMAGE),
 ]
 
 

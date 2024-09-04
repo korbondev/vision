@@ -3,7 +3,7 @@ from typing import Dict
 
 
 class Task(Enum):
-    # TODO: REMOVE ON NEXT DEPLOY AFTER 8TH OF AUGUST
+    # TODO: REMOVE ON VISION 5.0
     chat_mixtral = "chat-mixtral"
     chat_llama_3 = "chat-llama-3"
     playground_text_to_image = "playground-text-to-image"

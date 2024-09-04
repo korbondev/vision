@@ -58,8 +58,8 @@ def _normalise_period_scores(period_scores: List[PeriodScore]) -> float:
     if total_weight == 0:
         return 0
     else:
-        # Make sure UID's which are new don't instantly jump to the top
-        penalty = max(0, 1 - len(period_scores) / 8) / 4
+        # Make sure UID's which are new don't instantly jump to the top - you gotta earn it
+        penalty = 0.25 if len(period_scores) < 8 else 0
         return total_score / total_weight * (1 - penalty)
 
 
