@@ -640,15 +640,16 @@ class Synapse(BaseModel):
         # Getting the fields of the instance
         instance_fields = self.model_dump()
 
-        required = set(self.get_required_fields())
         # Iterating over the fields of the instance
         for field, value in instance_fields.items():
             # If the object is not optional, serializing it, encoding it, and adding it to the headers
+            required = self.get_required_fields()
+
             # Skipping the field if it's already in the headers or its value is None
             if field in headers or value is None:
                 continue
 
-            elif field in required:
+            elif required and field in required:
                 try:
                     # create an empty (dummy) instance of type(value) to pass pydantic validation on the axon side
                     serialized_value = json.dumps(value.__class__.__call__())
