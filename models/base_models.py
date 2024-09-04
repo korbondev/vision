@@ -13,6 +13,8 @@ try:
         Field,
         field_validator,
     )
+
+    FIELD_VALIDATOR_KWARGS = {"mode": "before"}
 except ImportError:
     from pydantic import (
         ConfigDict,
@@ -20,6 +22,8 @@ except ImportError:
         Field,
         validator as field_validator,
     )
+
+    FIELD_VALIDATOR_KWARGS = {"pre": True}
 
 from core import constants as cst, Task
 from core import core_dataclasses as dc
@@ -231,7 +235,7 @@ class ChatIncoming(BaseModel):
     # model_config = ConfigDict(use_enum_values=True)
     model: utility_models.ChatModels = Field(default=..., title="Model")
 
-    @field_validator("model", mode="before")
+    @field_validator("model", **FIELD_VALIDATOR_KWARGS)
     def validate_enum_field(cls, field):
         return utility_models.ChatModels(field)
 

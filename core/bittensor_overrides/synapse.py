@@ -30,6 +30,8 @@ try:
         field_validator,
         model_validator,
     )
+
+    FIELD_VALIDATOR_KWARGS = {"mode": "before"}
 except ImportError:
     from pydantic import (
         BaseModel,
@@ -38,6 +40,10 @@ except ImportError:
         validator as field_validator,
         root_validator as model_validator,
     )
+
+    FIELD_VALIDATOR_KWARGS = {"pre": True}
+
+
 import bittensor
 from typing import Optional, Any, Dict, ClassVar, Tuple
 
@@ -259,19 +265,19 @@ class TerminalInfo(BaseModel):
     )
 
     # Extract the process time on this terminal side of call as a float
-    _extract_process_time = field_validator("process_time", mode="before")(cast_float)
+    _extract_process_time = field_validator("process_time", **FIELD_VALIDATOR_KWARGS)(cast_float)
 
     # Extract the host port of the terminal as an int
-    _extract_port = field_validator("port", mode="before")(cast_int)
+    _extract_port = field_validator("port", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
     # Extract the bittensor version on the terminal as an int.
-    _extract_version = field_validator("version", mode="before")(cast_int)
+    _extract_version = field_validator("version", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
     # Extract the Unix timestamp associated with the terminal as an int
-    _extract_nonce = field_validator("nonce", mode="before")(cast_int)
+    _extract_nonce = field_validator("nonce", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
     # Extract the HTTP status code as an int
-    _extract_status_code = field_validator("status_code", mode="before")(cast_int)
+    _extract_status_code = field_validator("status_code", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
 
 class Synapse(BaseModel):
@@ -424,7 +430,7 @@ class Synapse(BaseModel):
         """
         return self
 
-    @model_validator(mode="before")
+    @model_validator(**FIELD_VALIDATOR_KWARGS)
     def set_name_type(cls, values) -> dict:
         values["name"] = cls.__name__  # type: ignore
         return values
@@ -500,11 +506,11 @@ class Synapse(BaseModel):
 
     required_hash_fields: ClassVar[Tuple[str, ...]] = ()
 
-    _extract_total_size = field_validator("total_size", mode="before")(cast_int)
+    _extract_total_size = field_validator("total_size", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
-    _extract_header_size = field_validator("header_size", mode="before")(cast_int)
+    _extract_header_size = field_validator("header_size", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
-    _extract_timeout = field_validator("timeout", mode="before")(cast_float)
+    _extract_timeout = field_validator("timeout", **FIELD_VALIDATOR_KWARGS)(cast_float)
 
     def __setattr__(self, name: str, value: Any):
         """
