@@ -4,6 +4,9 @@ from models import utility_models
 import random
 from core import constants as cst, dataclasses as dc
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 ALLOWED_PARAMS_FOR_ENGINE = {
     utility_models.EngineEnum.PROTEUS.value: {
         "steps": {
@@ -79,7 +82,6 @@ ALLOWED_PARAMS_FOR_ENGINE = {
             "generator": lambda: random.random() * 0.75,
         },
     },
-
 }
 
 

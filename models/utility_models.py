@@ -11,6 +11,9 @@ bt.synapse = bto_synapse
 from core import Task
 from validation.models import axon_uid
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 class QueryResult(BaseModel):
     formatted_response: Any = None

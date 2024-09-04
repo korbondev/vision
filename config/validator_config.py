@@ -5,9 +5,12 @@ from core import constants as core_cst
 import os
 import bittensor as bt
 from core.bittensor_overrides import synapse as bto_synapse
+import argparse
 
 bt.synapse = bto_synapse
-import argparse
+
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 
 
 def _get_env_file_from_cli_config() -> str:

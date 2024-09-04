@@ -31,6 +31,9 @@ from validation.db import post_stats
 from validation.db.db_management import db_manager
 from core import constants as core_cst
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 PROXY_VERSION = "4.2.1"
 # Change this to not be hardcoded, once the orchestrator supports is
 ORCHESTRATOR_VERSION = "0.1.0"

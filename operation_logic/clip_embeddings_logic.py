@@ -9,6 +9,9 @@ from pydantic import BaseModel
 from typing import List, Optional
 from config.miner_config import config as miner_config
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 class ClipEmbeddingsResponse(BaseModel):
     clip_embeddings: Optional[List[List[float]]] = None

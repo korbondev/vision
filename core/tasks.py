@@ -9,6 +9,8 @@ import bittensor as bt
 from core.bittensor_overrides import synapse as bto_synapse
 
 bt.synapse = bto_synapse
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 
 # I don't love this being here. How else should I do it though?
 # I don't want to rely on any extra third party service for fetching this info...

@@ -3,6 +3,9 @@ from typing import Optional
 from bittensor.chain_data import AxonInfo
 from pydantic import ConfigDict, BaseModel
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 class Model(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)

@@ -15,6 +15,8 @@ import bittensor as bt
 from core.bittensor_overrides import synapse as bto_synapse
 
 bt.synapse = bto_synapse
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 
 
 class VolumeForTask(BaseModel):

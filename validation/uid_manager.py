@@ -10,6 +10,9 @@ import bittensor as bt
 from core.bittensor_overrides import synapse as bto_synapse
 
 bt.synapse = bto_synapse
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 from validation.models import UIDRecord, axon_uid
 from validation.synthetic_data import synthetic_generations
 from core import tasks, constants as core_cst

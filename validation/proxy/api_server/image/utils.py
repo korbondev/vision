@@ -7,6 +7,9 @@ bt.synapse = bto_synapse
 from fastapi import HTTPException
 from models import utility_models
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 class NSFWContentException(fastapi.HTTPException):
     def __init__(self, detail: str = "NSFW content detected"):

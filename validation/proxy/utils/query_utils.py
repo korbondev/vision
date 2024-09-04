@@ -15,6 +15,9 @@ from collections import OrderedDict
 from validation.scoring import scoring_utils
 import ujson as json
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 class UIDQueue:
     def __init__(self):

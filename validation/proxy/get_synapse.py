@@ -7,6 +7,9 @@ bt.synapse = bto_synapse
 from core import utils as core_utils, constants as core_cst
 from validation.core_validator import core_validator
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 def get_synapse_from_body(
     body: BaseModel,

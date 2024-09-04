@@ -10,6 +10,9 @@ bt.synapse = bto_synapse
 from typing import Optional
 from datetime import datetime
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 task_data = defaultdict(lambda: defaultdict(list))
 
 axon_uid = int

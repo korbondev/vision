@@ -32,6 +32,9 @@ from pydantic import (
 import bittensor
 from typing import Optional, Any, Dict, ClassVar, Tuple
 
+if not hasattr(BaseModel, "model_dump"):
+    setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+
 
 def get_size(obj, seen=None) -> int:
     """
