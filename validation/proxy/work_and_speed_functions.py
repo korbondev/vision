@@ -15,22 +15,17 @@ CHARACTER_TO_TOKEN_CONVERSION = 4.0
 
 def _calculate_speed_modifier(time_per_unit: float, config: TaskConfig) -> float:
     """
-    Calculates the speed modifier based on the normalised response time
-    using sewed together gaussian distribution's
+    Calculates the speed modifier based on the normalized response time
+    using a sigmoid function, naturally capped between 0 and MAX_SPEED_BONUS
     """
     mean = config.mean
     variance = config.variance
 
     assert variance > 0
 
-    if time_per_unit <= mean:
-        # y = 1 + (M - 1) * (b - x)^c / b^c
-        speed_modifier = 1 + (MAX_SPEED_BONUS - 1) * ((mean - time_per_unit) ** BELOW_MEAN_EXPONENT) / (
-            mean**BELOW_MEAN_EXPONENT
-        )
-    else:
-        # y = e^((b - x) * v)
-        speed_modifier = math.exp((mean - time_per_unit) * variance)
+    # Use sigmoid function to naturally cap the speed modifier
+    x = (mean - time_per_unit) * variance
+    speed_modifier = MAX_SPEED_BONUS / (1 + math.exp(-x))
 
     return speed_modifier
 
@@ -70,7 +65,8 @@ def calculate_speed_modifier(task: Task, result: Dict[str, Any], synapse: Dict[s
 
     if config.task_type == TaskType.IMAGE:
         steps = synapse.get("steps", 1)
-        time_per_step = normalised_response_time / steps
+        work = _calculate_work_image(steps)
+        time_per_step = normalised_response_time / work
         return _calculate_speed_modifier(time_per_step, config)
     elif config.task_type == TaskType.TEXT:
         formatted_response = (
@@ -85,7 +81,8 @@ def calculate_speed_modifier(task: Task, result: Dict[str, Any], synapse: Dict[s
         if number_of_characters == 0:
             return 0  # Doesn't matter what is returned here
 
-        return _calculate_speed_modifier(normalised_response_time / number_of_characters, config)
+        work = _calculate_work_text(number_of_characters)
+        return _calculate_speed_modifier(normalised_response_time / work, config)
     elif config.task_type == TaskType.CLIP:
         return _calculate_speed_modifier(normalised_response_time, config)
     else:

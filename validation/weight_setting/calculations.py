@@ -24,7 +24,7 @@ async def _get_period_scores(miner_hotkey: str, task: Task) -> List[PeriodScore]
 async def _calculate_combined_quality_score(miner_hotkey: str, task: Task) -> float:
     reward_datas = await _get_reward_datas(miner_hotkey, task)
     combined_quality_scores = [
-        reward_data.quality_score * reward_data.speed_scoring_factor for reward_data in reward_datas
+        (reward_data.quality_score**1.5) * reward_data.speed_scoring_factor for reward_data in reward_datas
     ]
     if not combined_quality_scores:
         return 0
