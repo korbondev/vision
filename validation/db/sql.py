@@ -89,6 +89,16 @@ def select_tasks_and_number_of_results() -> str:
     SELECT {cst.COLUMN_TASK_NAME}, COUNT(*) FROM {cst.TABLE_TASKS} GROUP BY {cst.COLUMN_TASK_NAME}
     """
 
+def select_number_of_rewards_for_each_task() -> str:
+    return f"""
+    SELECT {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME},
+           COUNT({cst.TABLE_REWARD_DATA}.{cst.COLUMN_ID}) AS reward_count
+    FROM {cst.TABLE_TASKS}
+    LEFT JOIN {cst.TABLE_REWARD_DATA}
+    ON {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME} = {cst.TABLE_REWARD_DATA}.{cst.COLUMN_TASK}
+    GROUP BY {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME}
+    """
+
 
 def select_number_of_rewards_for_each_task() -> str:
     return f"""
