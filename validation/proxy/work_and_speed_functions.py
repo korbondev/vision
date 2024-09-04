@@ -1,4 +1,4 @@
-import json
+import ujson as json
 import math
 from typing import Dict, Any, List, Union
 
@@ -7,11 +7,6 @@ from core import tasks
 from core.tasks import TaskConfig, TaskType
 from models import base_models, utility_models
 import bittensor as bt
-
-MAX_SPEED_BONUS = 1.6  # Adjust this value as needed
-BELOW_MEAN_EXPONENT = 0.25
-CHARACTER_TO_TOKEN_CONVERSION = 4.0
-
 
 MAX_SPEED_BONUS = 1.6  # Adjust this value as needed
 BELOW_MEAN_EXPONENT = 0.25
@@ -87,9 +82,7 @@ def calculate_speed_modifier(task: Task, result: Dict[str, Any], synapse: Dict[s
             return 0  # Doesn't matter what is returned here
 
         work = _calculate_work_text(number_of_characters)
-        return _calculate_speed_modifier(
-            normalised_response_time / work, config
-        )
+        return _calculate_speed_modifier(normalised_response_time / work, config)
     elif config.task_type == TaskType.CLIP:
         return _calculate_speed_modifier(normalised_response_time, config)
     else:

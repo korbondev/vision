@@ -1,4 +1,4 @@
-import base64
+import pybase64 as base64
 from typing import Dict
 import numpy as np
 from PIL import Image

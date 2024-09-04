@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
-import json
+import random
+import ujson as json
 from typing import List, Dict, Any, Optional, Union
 
 import aiosqlite
@@ -53,7 +54,6 @@ class DatabaseManager:
         number_of_these_tasks_already_stored = await self._get_number_of_these_tasks_already_stored(task)
         if number_of_these_tasks_already_stored <= target_number_of_tasks_to_store:
             await self.insert_task_results(task.value, result, synapse, synthetic_query)
-
 
     async def insert_task_results(
         self, task: str, result: utility_models.QueryResult, synapse: bt.Synapse, synthetic_query: bool
