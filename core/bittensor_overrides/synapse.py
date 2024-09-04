@@ -510,6 +510,7 @@ class Synapse(BaseModel):
         examples=["0x0813029319030129u4120u10841824y0182u091u230912u"],
         default="",
         repr=False,
+        #  Inverse of the default at the top, whatever that is
         **{k: not v for k, v in BACK_COMPAT_KWARGS.items()},
     )
 
