@@ -264,7 +264,8 @@ class TerminalInfo(BaseModel):
         **BACK_COMPAT_KWARGS,
     )
 
-    def _create_cast_int_validator(self, field_name):
+    @staticmethod
+    def _create_cast_int_validator(field_name):
         def validator(value):
             return cast_int(value)
 
@@ -514,7 +515,8 @@ class Synapse(BaseModel):
 
     required_hash_fields: ClassVar[Tuple[str, ...]] = ()
 
-    def _create_cast_int_validator(self, field_name):
+    @staticmethod
+    def _create_cast_int_validator(field_name):
         def validator(value):
             return cast_int(value)
 
