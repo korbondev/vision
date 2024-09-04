@@ -307,7 +307,7 @@ def map_endpoint(post_endpoint, engine):
 
 
 async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: float = 20.0):
-    body_dict = body.dict()
+    body_dict = body.model_dump(mode="json")
 
     final_image_worker_url = miner_config.image_worker_url
     final_image_worker_url = map_endpoint(post_endpoint, body_dict.get("engine", ""))
@@ -316,18 +316,15 @@ async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: fl
 
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            response = await client.post(endpoint, json=body.model_dump())
+            response = await client.post(endpoint, json=body_dict)
             response.raise_for_status()
 
             data = response.json()
-            image_response = utility_models.ImageResponseBody(**data)
-            return image_response
-
+            return utility_models.ImageResponseBody(**data)
         except httpx.HTTPStatusError as error:
             bt.logging.warning(
                 f"Status error when getting an image; response {error.response.status_code} while making request to {endpoint}: {error}"
             )
-        # Sometimes error is logging as none, need some more info here!
         except httpx.RequestError as error:
             bt.logging.warning(
                 f"Request error getting an image; An error occurred while making request to {endpoint}: {error}"

@@ -56,7 +56,7 @@ class ChatOperation(abstract_operation.Operation):
             else:
                 raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
             task = tasks.get_task_from_synapse(synapse)
-            text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.dict()), url, task)
+            text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.model_dump()), url, task)
             text_streamer = partial(_send_text, text_generator)
         except Exception as e:
             bt.logging.error(e)

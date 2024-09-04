@@ -5,9 +5,9 @@ from core import constants as core_cst
 import os
 import bittensor as bt
 from core.bittensor_overrides import synapse as bto_synapse
+import argparse
 
 bt.synapse = bto_synapse
-import argparse
 
 
 def _get_env_file_from_cli_config() -> str:
