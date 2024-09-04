@@ -49,15 +49,14 @@ class ChatOperation(abstract_operation.Operation):
     @abstract_operation.enforce_concurrency_limits
     async def forward(synapse: synapses.Chat) -> synapses.Chat:
         try:
-            if synapse.model == utility_models.ChatModels.mixtral.value:
-                url = miner_config.mixtral_text_worker_url
-            elif synapse.model == utility_models.ChatModels.llama_3.value:
-                url = miner_config.llama_3_text_worker_url
+            if synapse.model == utility_models.ChatModels.llama_3_1_8b.value:
+                url = miner_config.llama_3_1_8b_text_worker_url
+            elif synapse.model == utility_models.ChatModels.llama_3_1_70b.value:
+                url = miner_config.llama_3_1_70b_text_worker_url
             else:
                 raise NotImplementedError(f"Model {synapse.model} not implemented for chat operation")
             task = tasks.get_task_from_synapse(synapse)
-            text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.model_dump()), url, task)
-
+            text_generator = await chat_logic.chat_logic(base_models.ChatIncoming(**synapse.dict()), url, task)
             text_streamer = partial(_send_text, text_generator)
         except Exception as e:
             bt.logging.error(e)

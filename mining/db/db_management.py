@@ -9,15 +9,20 @@ from threading import local
 DEFUALT_CONCURRENCY_GROUPS = {
     Task.chat_mixtral: 1,
     Task.chat_llama_3: 2,
+    Task.chat_llama_3_1_8b: 1,
+    Task.chat_llama_3_1_70b: 2,
     Task.proteus_text_to_image: 3,
     Task.playground_text_to_image: 3,
+    Task.flux_schnell_text_to_image: 3,
     Task.dreamshaper_text_to_image: 3,
     Task.proteus_image_to_image: 3,
     Task.playground_image_to_image: 3,
+    Task.flux_schnell_image_to_image: 3,
     Task.dreamshaper_image_to_image: 3,
     Task.jugger_inpainting: 3,
     Task.clip_image_embeddings: 3,  # disabled clip for now
     Task.avatar: 3,
+    # Task.upscale: 4,
 }
 
 DEFAULT_CONCURRENCY_GROUP_VALUES = {1: 7, 2: 7, 3: 1}

@@ -1,6 +1,6 @@
 from core import Task
 import enum
-import json
+import ujson as json
 import time
 from typing import Any, Dict, List, Optional, Union
 import httpx

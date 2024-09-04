@@ -2,16 +2,14 @@ import asyncio
 import re
 import threading
 from collections import defaultdict, deque
-import time
 from typing import Dict, Tuple
 from typing import List
 from typing import Optional
 from typing import Set
-
 from fastapi.responses import JSONResponse
 import httpx
 from pydantic import BaseModel
-
+import time
 from core import Task
 from core import TASK_TO_MAX_CAPACITY
 import bittensor as bt
@@ -33,7 +31,7 @@ from validation.db import post_stats
 from validation.db.db_management import db_manager
 from core import constants as core_cst
 
-PROXY_VERSION = "4.0"
+PROXY_VERSION = "4.2.1"
 # Change this to not be hardcoded, once the orchestrator supports is
 ORCHESTRATOR_VERSION = "0.1.0"
 
@@ -128,23 +126,23 @@ class CoreValidator:
         self.uid_manager = None
 
     def _get_task_weights(self) -> Dict[Task, float]:
-        """
-        TODO: Replace with onchain commitments. For initial testnet release,
-        Hardcode to a couple of values
-        """
         weights = {
-            Task.chat_mixtral: 0.1,
-            Task.chat_llama_3: 0.1,
-            Task.proteus_text_to_image: 0.2,
-            Task.playground_text_to_image: 0.1,
+            #
+            Task.chat_llama_3_1_8b: 0.15,
+            Task.chat_llama_3_1_70b: 0.20,
+            #
+            Task.proteus_text_to_image: 0.10,
+            Task.flux_schnell_text_to_image: 0.15,
             Task.dreamshaper_text_to_image: 0.05,
-            Task.proteus_image_to_image: 0.1,
-            Task.playground_image_to_image: 0.05,
+            #
+            Task.proteus_image_to_image: 0.05,
+            Task.flux_schnell_image_to_image: 0.05,
             Task.dreamshaper_image_to_image: 0.05,
+            #
             Task.jugger_inpainting: 0.05,
-            Task.clip_image_embeddings: 0.0,
-            Task.avatar: 0.20,
+            Task.avatar: 0.15,
         }
+
         db_manager.task_weights = weights
         return weights
 
@@ -219,6 +217,7 @@ class CoreValidator:
                     if uid not in self.capacities_for_tasks[task]:
                         self.capacities_for_tasks[task][uid] = float(volume.volume)
             await self._post_and_correct_capacities()
+
         bt.logging.info("Done fetching available tasks!")
 
     async def resync_metagraph(self):
@@ -327,6 +326,7 @@ class CoreValidator:
         )
 
     async def run_vali(self) -> None:
+        await db_manager.delete_reward_data_after_update()
         iteration = 1
         while True:
             await post_stats.post_to_tauvision(
@@ -338,7 +338,7 @@ class CoreValidator:
                 data_type_to_post=post_stats.DataTypeToPost.VALIDATOR_INFO,
             )
 
-            await db_manager.delete_data_older_than_date(minutes=60 * 24 * 2)
+            await db_manager.delete_data_older_than_date(minutes=60 * 24)
             await db_manager.delete_tasks_older_than_date(minutes=120)
 
             # Wait for initial syncing of metagraph
@@ -354,6 +354,7 @@ class CoreValidator:
                 synthetic_data_manager=self.synthetic_data_manager,
                 is_testnet=self.is_testnet,
             )
+
             await self.uid_manager.start_synthetic_scoring()
             await self.uid_manager.collect_synthetic_scoring_results()
             self.uid_manager.calculate_period_scores_for_uids()

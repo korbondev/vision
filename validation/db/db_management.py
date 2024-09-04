@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 import random
-import json
+import ujson as json
 from typing import List, Dict, Any, Optional, Union
 
 import aiosqlite
@@ -34,6 +34,12 @@ class DatabaseManager:
                 rows = await cursor.fetchall()
         return {row[0]: row[1] for row in rows}
 
+    async def get_number_of_rewards_for_each_task(self) -> Dict[str, int]:
+        async with db_lock:
+            async with self.conn.execute(sql.select_number_of_rewards_for_each_task()) as cursor:
+                rows = await cursor.fetchall()
+        return {row[0]: row[1] for row in rows}
+
     async def _get_number_of_these_tasks_already_stored(self, task: Task) -> int:
         async with db_lock:
             async with self.conn.execute(sql.select_count_rows_of_task_stored_for_scoring(), (task.value,)) as cursor:
@@ -44,18 +50,13 @@ class DatabaseManager:
         self, result: utility_models.QueryResult, task: Task, synapse: bt.Synapse, synthetic_query: bool
     ) -> None:
         if task not in self.task_weights:
-            bt.logging.error(f"{task} not in task weights in db_manager")
+            bt.logging.error(f"{task} not in task weights")
             return
         target_percentage = self.task_weights[task]
         target_number_of_tasks_to_store = int(MAX_TASKS_IN_DB_STORE * target_percentage)
         number_of_these_tasks_already_stored = await self._get_number_of_these_tasks_already_stored(task)
         if number_of_these_tasks_already_stored <= target_number_of_tasks_to_store:
             await self.insert_task_results(task.value, result, synapse, synthetic_query)
-        else:
-            actual_percentage = number_of_these_tasks_already_stored / MAX_TASKS_IN_DB_STORE
-            probability_to_score_again = (target_percentage / actual_percentage - target_percentage) ** 4
-            if random.random() < probability_to_score_again:
-                await self.insert_task_results(task.value, result, synapse, synthetic_query)
 
     async def insert_task_results(
         self, task: str, result: utility_models.QueryResult, synapse: bt.Synapse, synthetic_query: bool
@@ -140,6 +141,19 @@ class DatabaseManager:
             await self.conn.execute(sql.delete_uid_data_older_than(), (cutoff_time_str,))
             await self.conn.execute(sql.delete_task_data_older_than(), (cutoff_time_str,))
 
+            await self.conn.commit()
+
+    async def delete_reward_data_after_update(self) -> None:
+        """
+        Delete anything before 26th august 2pm UTC
+
+        TODO: REMOVE AFTER NEXT UPDATE
+        """
+        cutoff_time = datetime(2024, 8, 26, 2, 0, 0)
+        cutoff_time_str = cutoff_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        async with db_lock:
+            await self.conn.execute(sql.delete_reward_data_older_than(), (cutoff_time_str,))
             await self.conn.commit()
 
     async def fetch_recent_most_rewards_for_uid(

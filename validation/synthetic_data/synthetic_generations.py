@@ -1,8 +1,9 @@
 import asyncio
-import base64
+import pybase64 as base64
 import random
 import string
 import threading
+import time
 import httpx
 from typing import Dict, Any
 from config.validator_config import config as validator_config
@@ -85,6 +86,7 @@ class SyntheticDataManager:
             tasks_needing_synthetic_data = [
                 task for task in tasks.Task if task not in self.task_to_stored_synthetic_data
             ]
+            time.sleep(0.1)
 
         while True:
             for task in tasks.Task:
@@ -127,13 +129,13 @@ class SyntheticDataManager:
         else:
             try:
                 async with httpx.AsyncClient(timeout=7) as client:
+                    json_data = {"task": task.value}
                     response = await client.post(
                         validator_config.external_server_url + "get-synthetic-data",
-                        json={"task": task.value},
+                        json=json_data,
                     )
                     response.raise_for_status()  # raises an HTTPError if an unsuccessful status code was received
             except httpx.RequestError:
-                # bt.logging.warning(f"Getting synthetic data error: {err.request.url!r}: {err}")
                 return None
             except httpx.HTTPStatusError:
                 # bt.logging.warning(

@@ -23,12 +23,22 @@ from validation.db.db_management import db_manager
 TASK_TO_VOLUME_TO_REQUESTS_CONVERSION: Dict[Task, float] = {
     Task.chat_llama_3: 300,
     Task.chat_mixtral: 300,
-    Task.proteus_text_to_image: 10,
     Task.playground_text_to_image: 50,
-    Task.dreamshaper_text_to_image: 10,
-    Task.proteus_image_to_image: 10,
     Task.playground_image_to_image: 50,
+    #
+    Task.chat_llama_3_1_8b: 300,
+    Task.chat_llama_3_1_70b: 300,
+    #
+    Task.proteus_text_to_image: 10,
+    Task.flux_schnell_text_to_image: 25,
+    Task.dreamshaper_text_to_image: 10,
+    #
+    Task.proteus_image_to_image: 10,
+    Task.flux_schnell_image_to_image: 25,
     Task.dreamshaper_image_to_image: 10,
+    #
+    # Task.upscale: 1,
+    #
     Task.jugger_inpainting: 20,
     Task.avatar: 10,
     Task.clip_image_embeddings: 1,
@@ -139,6 +149,7 @@ class UidManager:
 
         i = 0
         tasks_in_progress = []
+
         while uid_record.synthetic_requests_still_to_make > 0:
             # Random perturbation to make sure we dont burst
             if i == 0:

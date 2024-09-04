@@ -5,7 +5,7 @@ from core.bittensor_overrides import synapse as bto_synapse
 
 bt.synapse = bto_synapse
 import httpx
-import json
+import ujson as json
 from typing import AsyncGenerator
 from mining.proxy.core_miner import miner_requests_stats
 

@@ -53,6 +53,9 @@ miner_requests_stats = MinerRequestsStatus()
 
 
 def base_blacklist(synapse: T) -> Tuple[bool, str]:
+    # if synapse.dendrite.
+    if MIN_VALIDATOR_STAKE == 0:
+        return False, synapse.dendrite.hotkey  # its only 0 if we are on testnet
     if synapse.dendrite.hotkey not in metagraph.hotkeys:
         bt.logging.trace(f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}")
         return True, synapse.dendrite.hotkey

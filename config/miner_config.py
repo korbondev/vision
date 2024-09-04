@@ -36,8 +36,8 @@ class Config(BaseModel):
     subtensor_chainendpoint: Optional[str] = os.getenv(core_cst.SUBTENSOR_CHAINENDPOINT_PARAM, None)
 
     image_worker_url: Optional[str] = os.getenv(core_cst.IMAGE_WORKER_URL_PARAM, None)
-    mixtral_text_worker_url: Optional[str] = os.getenv(core_cst.MIXTRAL_TEXT_WORKER_URL_PARAM, None)
-    llama_3_text_worker_url: Optional[str] = os.getenv(core_cst.LLAMA_3_TEXT_WORKER_URL_PARAM, None)
+    llama_3_1_8b_text_worker_url: Optional[str] = os.getenv(core_cst.LLAMA_3_1_8B_TEXT_WORKER_URL_PARAM, None)
+    llama_3_1_70b_text_worker_url: Optional[str] = os.getenv(core_cst.LLAMA_3_1_70B_TEXT_WORKER_URL_PARAM, None)
 
     axon_port: str = os.getenv(core_cst.AXON_PORT_PARAM, 8012)
     axon_external_ip: str = os.getenv(core_cst.AXON_EXTERNAL_IP_PARAM, "127.0.0.1")

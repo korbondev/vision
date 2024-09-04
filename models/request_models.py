@@ -58,6 +58,28 @@ ALLOWED_PARAMS_FOR_ENGINE = {
             "generator": lambda: random.random() * 0.75,
         },
     },
+    utility_models.EngineEnum.FLUX.value: {
+        "steps": {
+            "checker": lambda x: isinstance(x, int) and x in range(10, 31),
+            "error_message": "should be an integer between 10 and 30 (inclusive)",
+        },
+        "height": {
+            "checker": lambda h: 512 <= h <= 1344 and h % 64 == 0,
+            "error_message": "should be in between 512 and 1344 (inclusive) and multiple of 64",
+        },
+        "width": {
+            "checker": lambda w: 512 <= w <= 1344 and w % 64 == 0,
+            "error_message": "should be in between 512 and 1344 (inclusive) and multiple of 64",
+            "generator": lambda: random.choice([i for i in range(512, 1344 + 64, 64)]),
+        },
+        "cfg_scale": {"checker": lambda c: 1 <= c <= 100, "error_message": "should be between 1 and 10"},
+        "image_strength": {
+            "checker": lambda i: 0.0 <= i <= 0.75,
+            "error_message": "should be between 0.0 and 0.75",
+            "generator": lambda: random.random() * 0.75,
+        },
+    },
+
 }
 
 
@@ -281,6 +303,8 @@ class ChatRequest(BaseModel):
         title="Model",
         description="The model to use for text generation.",
     )
+
+    stream: bool = Field(True, title="Stream", description="Stream the text generation. ")
 
     max_tokens: int = Field(500, title="Max Tokens", description="Max tokens for text generation.")
 

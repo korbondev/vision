@@ -14,7 +14,7 @@ from validation.proxy.utils import constants as cst
 import httpx
 from config.validator_config import config as validator_config
 from validation.proxy import work_and_speed_functions
-import json
+import ujson as json
 from validation.db.db_management import db_manager
 from validation.db import post_stats
 import os
@@ -70,7 +70,7 @@ class Scorer:
 
     async def _score_results(self):
         min_tasks_to_start_scoring = (
-            cst.MINIMUM_TASKS_TO_START_SCORING if self.testnet else cst.MINIMUM_TASKS_TO_START_SCORING_TESTNET
+            cst.MINIMUM_TASKS_TO_START_SCORING if not self.testnet else cst.MINIMUM_TASKS_TO_START_SCORING_TESTNET
         )
         while True:
             tasks_and_number_of_results = await db_manager.get_tasks_and_number_of_results()
@@ -82,7 +82,10 @@ class Scorer:
 
             else:
                 task_to_score = random.choices(
-                    list(tasks_and_number_of_results.keys()), weights=list(tasks_and_number_of_results.values()), k=1
+                    list(tasks_and_number_of_results.keys()),
+                    weights=list(tasks_and_number_of_results.values()),
+                   
+                    k=1,,
                 )[0]
 
                 await self._check_scores_for_task(Task(task_to_score))

@@ -17,27 +17,45 @@ bt.synapse = bto_synapse
 TASK_IS_STREAM: Dict[Task, bool] = {
     Task.chat_mixtral: True,
     Task.chat_llama_3: True,
-    Task.proteus_text_to_image: False,
+    Task.chat_llama_3_1_8b: True,
+    Task.chat_llama_3_1_70b: True,
+    #
     Task.playground_text_to_image: False,
-    Task.dreamshaper_text_to_image: False,
-    Task.proteus_image_to_image: False,
     Task.playground_image_to_image: False,
+    #
+    Task.proteus_text_to_image: False,
+    Task.flux_schnell_text_to_image: False,
+    Task.dreamshaper_text_to_image: False,
+    #
+    Task.proteus_image_to_image: False,
+    Task.flux_schnell_image_to_image: False,
     Task.dreamshaper_image_to_image: False,
+    #
+    # Task.upscale: False,
+    #
     Task.jugger_inpainting: False,
-    Task.clip_image_embeddings: False,
     Task.avatar: False,
 }
 TASKS_TO_SYNAPSE: Dict[Task, bt.Synapse] = {
     Task.chat_mixtral: synapses.Chat,
     Task.chat_llama_3: synapses.Chat,
-    Task.proteus_text_to_image: synapses.TextToImage,
     Task.playground_text_to_image: synapses.TextToImage,
-    Task.dreamshaper_text_to_image: synapses.TextToImage,
-    Task.proteus_image_to_image: synapses.ImageToImage,
     Task.playground_image_to_image: synapses.ImageToImage,
+    #
+    Task.chat_llama_3_1_8b: synapses.Chat,
+    Task.chat_llama_3_1_70b: synapses.Chat,
+    #
+    Task.proteus_text_to_image: synapses.TextToImage,
+    Task.flux_schnell_text_to_image: synapses.TextToImage,
+    Task.dreamshaper_text_to_image: synapses.TextToImage,
+    #
+    Task.proteus_image_to_image: synapses.ImageToImage,
+    Task.flux_schnell_image_to_image: synapses.ImageToImage,
     Task.dreamshaper_image_to_image: synapses.ImageToImage,
+    #
+    # Task.upscale: synapses.Upscale,
+    #
     Task.jugger_inpainting: synapses.Inpaint,
-    Task.clip_image_embeddings: synapses.ClipEmbeddings,
     Task.avatar: synapses.Avatar,
 }
 
@@ -48,6 +66,10 @@ def get_task_from_synapse(synapse: bt.Synapse) -> Optional[Task]:
             return Task.chat_mixtral
         elif synapse.model == utility_models.ChatModels.llama_3.value:
             return Task.chat_llama_3
+        elif synapse.model == utility_models.ChatModels.llama_3_1_8b.value:
+            return Task.chat_llama_3_1_8b
+        elif synapse.model == utility_models.ChatModels.llama_3_1_70b.value:
+            return Task.chat_llama_3_1_70b
         else:
             return None
     elif isinstance(synapse, synapses.TextToImage):
@@ -57,6 +79,8 @@ def get_task_from_synapse(synapse: bt.Synapse) -> Optional[Task]:
             return Task.playground_text_to_image
         elif synapse.engine == utility_models.EngineEnum.DREAMSHAPER.value:
             return Task.dreamshaper_text_to_image
+        elif synapse.engine == utility_models.EngineEnum.FLUX.value:
+            return Task.flux_schnell_text_to_image
         else:
             return None
     elif isinstance(synapse, synapses.ImageToImage):
@@ -66,14 +90,18 @@ def get_task_from_synapse(synapse: bt.Synapse) -> Optional[Task]:
             return Task.playground_image_to_image
         elif synapse.engine == utility_models.EngineEnum.DREAMSHAPER.value:
             return Task.dreamshaper_image_to_image
+        elif synapse.engine == utility_models.EngineEnum.FLUX.value:
+            return Task.flux_schnell_image_to_image
         else:
             return None
     elif isinstance(synapse, synapses.Inpaint):
         return Task.jugger_inpainting
-    elif isinstance(synapse, synapses.ClipEmbeddings):
-        return Task.clip_image_embeddings
+
     elif isinstance(synapse, synapses.Avatar):
         return Task.avatar
+
+    # elif isinstance(synapse, synapses.Upscale):
+    #     return Task.upscale
     else:
         return None
 
@@ -81,7 +109,7 @@ def get_task_from_synapse(synapse: bt.Synapse) -> Optional[Task]:
 class TaskType(Enum):
     IMAGE = "image"
     TEXT = "text"
-    CLIP = "clip"
+    # UPSCALE = "upscale"
 
 
 class TaskConfig(BaseModel):
@@ -93,77 +121,17 @@ class TaskConfig(BaseModel):
 
 
 TASK_CONFIGS = [
-    TaskConfig(
-        task=Task.proteus_text_to_image,
-        overhead=0.5,
-        mean=0.18,
-        variance=3,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(
-        task=Task.dreamshaper_text_to_image,
-        overhead=0.5,
-        mean=0.20,
-        variance=3,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(
-        task=Task.playground_text_to_image,
-        overhead=0.5,
-        mean=0.1,
-        variance=10,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(
-        task=Task.proteus_image_to_image,
-        overhead=0.5,
-        mean=0.20,
-        variance=3,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(
-        task=Task.dreamshaper_image_to_image,
-        overhead=0.5,
-        mean=0.27,
-        variance=3,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(
-        task=Task.playground_image_to_image,
-        overhead=0.5,
-        mean=0.10,
-        variance=10,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(
-        task=Task.jugger_inpainting,
-        overhead=1.2,
-        mean=0.15,
-        variance=2,
-        task_type=TaskType.IMAGE,
-    ),
-    TaskConfig(task=Task.avatar, overhead=5, mean=0.40, variance=3, task_type=TaskType.IMAGE),
-    TaskConfig(
-        task=Task.chat_mixtral,
-        overhead=1,
-        mean=0.006,
-        variance=80,
-        task_type=TaskType.TEXT,
-    ),
-    TaskConfig(
-        task=Task.chat_llama_3,
-        overhead=1,
-        mean=0.008,
-        variance=80,
-        task_type=TaskType.TEXT,
-    ),
-    TaskConfig(
-        task=Task.clip_image_embeddings,
-        overhead=1,
-        mean=0.5,
-        variance=2,
-        task_type=TaskType.CLIP,
-    ),
+    # TaskConfig(task=Task.upscale, overhead=0.5, mean=0.80, variance=1, task_type=TaskType.UPSCALE),
+    TaskConfig(task=Task.chat_llama_3_1_70b, overhead=0.3, mean=0.018, variance=130, task_type=TaskType.TEXT),
+    TaskConfig(task=Task.chat_llama_3_1_8b, overhead=0.2, mean=0.009, variance=200, task_type=TaskType.TEXT),
+    TaskConfig(task=Task.proteus_image_to_image, overhead=0.6, mean=0.24, variance=5, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.proteus_text_to_image, overhead=0.25, mean=0.2, variance=7, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.flux_schnell_text_to_image, overhead=0.4, mean=0.30, variance=7, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.flux_schnell_image_to_image, overhead=0.6, mean=0.36, variance=5, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.avatar, overhead=0.5, mean=0.50, variance=4, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.dreamshaper_text_to_image, overhead=0.3, mean=0.22, variance=7, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.dreamshaper_image_to_image, overhead=0.6, mean=0.28, variance=5, task_type=TaskType.IMAGE),
+    TaskConfig(task=Task.jugger_inpainting, overhead=0.4, mean=0.3, variance=4, task_type=TaskType.IMAGE),
 ]
 
 
