@@ -53,6 +53,9 @@ if not hasattr(BaseModel, "model_copy"):
     setattr(BaseModel, "model_copy", getattr(BaseModel, "copy"))
 if not hasattr(BaseModel, "model_dump_json"):
     setattr(BaseModel, "model_dump_json", getattr(BaseModel, "json"))
+    BACK_COMPAT_KWARGS = {"allow_mutation": True}
+else:
+    BACK_COMPAT_KWARGS = {"frozen": False}
 
 
 def get_size(obj, seen=None) -> int:

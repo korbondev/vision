@@ -16,6 +16,9 @@ if not hasattr(BaseModel, "model_copy"):
     setattr(BaseModel, "model_copy", getattr(BaseModel, "copy"))
 if not hasattr(BaseModel, "model_dump_json"):
     setattr(BaseModel, "model_dump_json", getattr(BaseModel, "json"))
+    BACK_COMPAT_KWARGS = {"allow_mutation": True}
+else:
+    BACK_COMPAT_KWARGS = {"frozen": False}
 
 task_data = defaultdict(lambda: defaultdict(list))
 
@@ -30,7 +33,7 @@ class PeriodScore(BaseModel):
 
 
 class UIDRecord(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True, frozen=False)
+    model_config = ConfigDict(arbitrary_types_allowed=True, **BACK_COMPAT_KWARGS)
 
     axon_uid: axon_uid
     hotkey: str
