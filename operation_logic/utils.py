@@ -12,7 +12,7 @@ import torch
 from PIL import Image, ImageOps
 from models import utility_models
 from core import constants as cst
-from core import dataclasses as dc
+from core import core_dataclasses as dc
 from pydantic import BaseModel
 from config.miner_config import config as miner_config
 import httpx
@@ -310,7 +310,7 @@ def map_endpoint(post_endpoint, engine):
 
 
 async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: float = 20.0):
-    body_dict = body.model_dump(mode="json")
+    body_dict = body.model_dump()
 
     final_image_worker_url = miner_config.image_worker_url
     final_image_worker_url = map_endpoint(post_endpoint, body_dict.get("engine", ""))

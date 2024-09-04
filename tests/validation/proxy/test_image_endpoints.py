@@ -1,6 +1,6 @@
 import requests  # noqa
 from models import request_models, utility_models  # noqa
-from core import dataclasses as dc  # noqa
+from core import core_dataclasses as dc  # noqa
 import base64  # noqa
 from core import utils  # noqa
 from dotenv import load_dotenv  # noqa
