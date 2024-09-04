@@ -7,6 +7,7 @@ bt.synapse = bto_synapse
 from fastapi import HTTPException
 from models import utility_models
 
+#  All hacky backwards compatibility stuff
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):

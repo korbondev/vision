@@ -15,6 +15,7 @@ from collections import OrderedDict
 from validation.scoring import scoring_utils
 import ujson as json
 
+#  All hacky backwards compatibility stuff
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):

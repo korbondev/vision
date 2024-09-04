@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from config.miner_config import config as miner_config
 
+#  All hacky backwards compatibility stuff
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from core import Task
 
+#  All hacky backwards compatibility stuff
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):

@@ -7,6 +7,7 @@ bt.synapse = bto_synapse
 from core import utils as core_utils, constants as core_cst
 from validation.core_validator import core_validator
 
+#  All hacky backwards compatibility stuff
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):
