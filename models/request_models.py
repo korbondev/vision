@@ -6,6 +6,8 @@ from core import constants as cst, dataclasses as dc
 
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+if not hasattr(BaseModel, "model_copy"):
+    setattr(BaseModel, "model_copy", getattr(BaseModel, "copy"))
 
 ALLOWED_PARAMS_FOR_ENGINE = {
     utility_models.EngineEnum.PROTEUS.value: {

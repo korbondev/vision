@@ -10,6 +10,8 @@ import argparse
 bt.synapse = bto_synapse
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
+if not hasattr(BaseModel, "model_copy"):
+    setattr(BaseModel, "model_copy", getattr(BaseModel, "copy"))
 
 
 def _get_env_file_from_cli_config() -> str:
