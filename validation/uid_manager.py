@@ -210,6 +210,7 @@ class UidManager:
             return JSONResponse(content={"error": f"No UIDs available for this task {task}"}, status_code=500)
         uid_record = self.uid_records_for_tasks[task][latest_uid]
         attempts = 0
+        failed_uids = []
 
         if not stream:
             while attempts < 3:
@@ -223,6 +224,7 @@ class UidManager:
                 )
                 if query_result is None or not query_result.success:
                     attempts += 1
+                    failed_uids.append(uid_record.axon_uid)
                 else:
                     break
         else:
@@ -240,10 +242,25 @@ class UidManager:
                     query_result = _async_chain(first_chunk, generator)
                     break
                 except StopAsyncIteration:
+                    failed_uids.append(uid_record.axon_uid)
                     attempts += 1
 
-        if attempts == 3:
+        if attempts >= 3:
             return JSONResponse(content={"error": "Could not process request, mi apologies"}, status_code=500)
+        else:
+            for failed_uid in failed_uids:
+                uid_record = self.uid_records_for_tasks[task][failed_uid]
+                query_utils.create_scoring_adjustment_task(utility_models.QueryResult(
+                    status_code=500,
+                    success=False,
+                    formatted_response=None,
+                    failed_axon_uids=[],
+                    task=task,
+                ),
+                synapse,
+                    uid_record,
+                    False,
+                )
         return query_result
 
     @staticmethod

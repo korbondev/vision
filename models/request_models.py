@@ -60,8 +60,8 @@ ALLOWED_PARAMS_FOR_ENGINE = {
     },
     utility_models.EngineEnum.FLUX.value: {
         "steps": {
-            "checker": lambda x: isinstance(x, int) and x in range(10, 31),
-            "error_message": "should be an integer between 10 and 30 (inclusive)",
+            "checker": lambda x: isinstance(x, int) and x in range(2, 26),
+            "error_message": "should be an integer between 2 and 25 (inclusive)",
         },
         "height": {
             "checker": lambda h: 512 <= h <= 1344 and h % 64 == 0,
@@ -79,7 +79,6 @@ ALLOWED_PARAMS_FOR_ENGINE = {
             "generator": lambda: random.random() * 0.75,
         },
     },
-
 }
 
 
