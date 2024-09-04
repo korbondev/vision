@@ -13,6 +13,8 @@ if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):
     setattr(BaseModel, "model_copy", getattr(BaseModel, "copy"))
+if not hasattr(BaseModel, "model_dump_json"):
+    setattr(BaseModel, "model_dump_json", getattr(BaseModel, "json"))
 
 # I don't love this being here. How else should I do it though?
 # I don't want to rely on any extra third party service for fetching this info...

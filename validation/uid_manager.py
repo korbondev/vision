@@ -14,6 +14,8 @@ if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):
     setattr(BaseModel, "model_copy", getattr(BaseModel, "copy"))
+if not hasattr(BaseModel, "model_dump_json"):
+    setattr(BaseModel, "model_dump_json", getattr(BaseModel, "json"))
 
 from validation.models import UIDRecord, axon_uid
 from validation.synthetic_data import synthetic_generations
