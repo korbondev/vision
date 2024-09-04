@@ -100,6 +100,17 @@ def select_number_of_rewards_for_each_task() -> str:
     """
 
 
+def select_number_of_rewards_for_each_task() -> str:
+    return f"""
+    SELECT {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME},
+           COUNT({cst.TABLE_REWARD_DATA}.{cst.COLUMN_ID}) AS reward_count
+    FROM {cst.TABLE_TASKS}
+    LEFT JOIN {cst.TABLE_REWARD_DATA}
+    ON {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME} = {cst.TABLE_REWARD_DATA}.{cst.COLUMN_TASK}
+    GROUP BY {cst.TABLE_TASKS}.{cst.COLUMN_TASK_NAME}
+    """
+
+
 def select_count_of_rows_in_tasks() -> str:
     return f"""
     SELECT COUNT(*) FROM {cst.TABLE_TASKS}
@@ -110,6 +121,7 @@ def select_count_rows_of_task_stored_for_scoring() -> str:
     return f"""
     SELECT COUNT(*) FROM {cst.TABLE_TASKS} WHERE {cst.COLUMN_TASK_NAME} = ?
     """
+
 
 def select_task_for_deletion() -> str:
     return f"""
@@ -125,7 +137,6 @@ def select_task_for_deletion() -> str:
     ORDER BY COALESCE(r.reward_count, 0) ASC
     LIMIT 1
     """
-
 
 
 def select_recent_reward_data_for_a_task():

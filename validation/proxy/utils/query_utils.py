@@ -10,7 +10,7 @@ from validation.models import UIDRecord, axon_uid
 from core import bittensor_overrides as bto
 from collections import OrderedDict
 from validation.scoring import scoring_utils
-import json
+import ujson as json
 
 
 class UIDQueue:

@@ -2,7 +2,7 @@ from core import Task
 from models import base_models
 import bittensor as bt
 import httpx
-import json
+import ujson as json
 from typing import AsyncGenerator
 from mining.proxy.core_miner import miner_requests_stats
 

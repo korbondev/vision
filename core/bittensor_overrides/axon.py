@@ -21,7 +21,7 @@
 import os
 import uuid
 import copy
-import json
+import ujson as json
 import time
 import asyncio
 import inspect
@@ -52,6 +52,11 @@ from bittensor.errors import (
     PostProcessException,
     InternalServerError,
 )
+from config.miner_config import config as miner_config
+from core.tasks import get_task_from_synapse
+
+
+IS_TESTNET = miner_config.subtensor_network == "test"
 
 
 class FastAPIThreadedServer(uvicorn.Server):
@@ -875,7 +880,8 @@ class axon:
         if endpoint_key in self.nonces.keys():
             # Ensure the nonce increases.
             if synapse.dendrite.nonce <= self.nonces[endpoint_key]:
-                raise Exception("Nonce is too small")
+                if not IS_TESTNET:
+                    raise Exception("Nonce is too small")
 
         if not keypair.verify(message, synapse.dendrite.signature):
             raise Exception(f"Signature mismatch with {message} and {synapse.dendrite.signature}")
@@ -974,6 +980,7 @@ class AxonMiddleware(BaseHTTPMiddleware):
         """
         # Records the start time of the request processing.
         start_time = time.time()
+        precision_start_time = time.perf_counter()
 
         try:
             # Set up the synapse from its headers.
@@ -1052,8 +1059,12 @@ class AxonMiddleware(BaseHTTPMiddleware):
         finally:
             # Log the details of the processed synapse, including total size, name, hotkey, IP, port,
             # status code, and status message, using the debug level of the logger.
+
+            process_time = time.perf_counter() - precision_start_time
+            logging_sentence = f"{request.method} {request.url.path} took {process_time:.6f} seconds to run for '{get_task_from_synapse(synapse)}'!"
+
             bittensor.logging.debug(
-                f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message}"
+                f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message} || Custom message: {logging_sentence} "
             )
 
             # Return the response to the requester.
@@ -1192,6 +1203,8 @@ class AxonMiddleware(BaseHTTPMiddleware):
         # that are prohibited from accessing certain resources.
         # We retrieve the blacklist checking function from the 'blacklist_fns' dictionary
         # that corresponds to the request's name (synapse name).
+        if IS_TESTNET:
+            return
         blacklist_fn = self.axon.blacklist_fns.get(synapse.name)
 
         # If a blacklist checking function exists for the request's name

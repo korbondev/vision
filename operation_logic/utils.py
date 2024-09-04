@@ -1,4 +1,4 @@
-import base64
+import pybase64 as base64
 import hashlib
 import io
 import math
@@ -17,6 +17,19 @@ from pydantic import BaseModel
 from config.miner_config import config as miner_config
 import httpx
 import bittensor as bt
+
+
+ENDPOINT_TO_PORT_MAP = {
+    "avatar": 7212,
+    "inpaint": 7222,
+    ("proteus", "txt2img"): 7231,
+    ("proteus", "img2img"): 7232,
+    ("dreamshaper", "txt2img"): 7241,
+    ("dreamshaper", "img2img"): 7242,
+    ("flux-schnell", "txt2img"): 7251,
+    ("flux-schnell", "img2img"): 7252,
+    # ("",""): ,
+}
 
 
 def crop_images(image_array: List[Image.Image], width: int, height: int) -> List[Image.Image]:
@@ -283,11 +296,24 @@ def model_to_printable_dict(model: Optional[BaseModel], max_length: int = 50) ->
             return value
 
 
+def map_endpoint(post_endpoint, engine):
+    if post_endpoint in ["avatar", "inpaint"]:
+        return f"http://127.0.0.1:{ENDPOINT_TO_PORT_MAP[post_endpoint]}/"
+
+    return f"http://127.0.0.1:{ENDPOINT_TO_PORT_MAP[(engine,post_endpoint)]}/"
+
+
 async def get_image_from_server(body: BaseModel, post_endpoint: str, timeout: float = 20.0):
-    endpoint = miner_config.image_worker_url + post_endpoint
+    body_dict = body.dict()
+
+    final_image_worker_url = miner_config.image_worker_url
+    final_image_worker_url = map_endpoint(post_endpoint, body_dict.get("engine", ""))
+
+    endpoint = f"{final_image_worker_url}{post_endpoint}"
+
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
-            response = await client.post(endpoint, json=body.dict())
+            response = await client.post(endpoint, json=body_dict)
             response.raise_for_status()
 
             data = response.json()
