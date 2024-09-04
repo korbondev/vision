@@ -5,11 +5,24 @@ Keep it as SynapseNameBase / SynapseNameIncoming / SynapseNameOutgoing
 """
 
 from typing import List, Optional, Dict
-from pydantic import ConfigDict, BaseModel, Field, field_validator
 
+try:
+    from pydantic import (
+        ConfigDict,
+        BaseModel,
+        Field,
+        field_validator,
+    )
+except ImportError:
+    from pydantic import (
+        ConfigDict,
+        BaseModel,
+        Field,
+        validator as field_validator,
+    )
 
 from core import constants as cst, Task
-from core import dataclasses as dc
+from core import core_dataclasses as dc
 from models import utility_models
 import bittensor as bt
 from core.bittensor_overrides import synapse as bto_synapse

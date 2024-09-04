@@ -1,8 +1,23 @@
-from pydantic import field_validator, ConfigDict, BaseModel, Field, model_validator
+try:
+    from pydantic import (
+        field_validator,
+        ConfigDict,
+        BaseModel,
+        Field,
+        model_validator,
+    )
+except ImportError:
+    from pydantic import (
+        validator as field_validator,
+        ConfigDict,
+        BaseModel,
+        Field,
+        root_validator as model_validator,
+    )
 from typing import Optional, List
 from models import utility_models
 import random
-from core import constants as cst, dataclasses as dc
+from core import constants as cst, core_dataclasses as dc
 
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))

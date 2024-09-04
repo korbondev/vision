@@ -22,13 +22,22 @@ import json
 import sys
 import warnings
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    field_validator,
-    model_validator,
-)
+try:
+    from pydantic import (
+        BaseModel,
+        ConfigDict,
+        Field,
+        field_validator,
+        model_validator,
+    )
+except ImportError:
+    from pydantic import (
+        BaseModel,
+        ConfigDict,
+        Field,
+        validator as field_validator,
+        root_validator as model_validator,
+    )
 import bittensor
 from typing import Optional, Any, Dict, ClassVar, Tuple
 
