@@ -21,5 +21,5 @@
 #!/bin/bash
 
 # Function to run a command with sudo only if it is available
-./launch_validators.sh --without-self-heal
+# ./launch_validators.sh --without-self-heal
 echo "Autoupdate steps complete :)"
