@@ -264,20 +264,28 @@ class TerminalInfo(BaseModel):
         frozen=False,
     )
 
+    def _create_cast_int_validator(self, field_name):
+        def validator(value):
+            return cast_int(value)
+
+        return validator
+
     # Extract the process time on this terminal side of call as a float
     _extract_process_time = field_validator("process_time", **FIELD_VALIDATOR_KWARGS)(cast_float)
 
     # Extract the host port of the terminal as an int
-    _extract_port = field_validator("port", **FIELD_VALIDATOR_KWARGS)(cast_int)
+    _extract_port = field_validator("port", **FIELD_VALIDATOR_KWARGS)(_create_cast_int_validator("port"))
 
     # Extract the bittensor version on the terminal as an int.
-    _extract_version = field_validator("version", **FIELD_VALIDATOR_KWARGS)(cast_int)
+    _extract_version = field_validator("version", **FIELD_VALIDATOR_KWARGS)(_create_cast_int_validator("version"))
 
     # Extract the Unix timestamp associated with the terminal as an int
-    _extract_nonce = field_validator("nonce", **FIELD_VALIDATOR_KWARGS)(cast_int)
+    _extract_nonce = field_validator("nonce", **FIELD_VALIDATOR_KWARGS)(_create_cast_int_validator("nonce"))
 
     # Extract the HTTP status code as an int
-    _extract_status_code = field_validator("status_code", **FIELD_VALIDATOR_KWARGS)(cast_int)
+    _extract_status_code = field_validator("status_code", **FIELD_VALIDATOR_KWARGS)(
+        _create_cast_int_validator("status_code")
+    )
 
 
 class Synapse(BaseModel):
@@ -506,9 +514,19 @@ class Synapse(BaseModel):
 
     required_hash_fields: ClassVar[Tuple[str, ...]] = ()
 
-    _extract_total_size = field_validator("total_size", **FIELD_VALIDATOR_KWARGS)(cast_int)
+    def _create_cast_int_validator(self, field_name):
+        def validator(value):
+            return cast_int(value)
 
-    _extract_header_size = field_validator("header_size", **FIELD_VALIDATOR_KWARGS)(cast_int)
+        return validator
+
+    _extract_total_size = field_validator("total_size", **FIELD_VALIDATOR_KWARGS)(
+        _create_cast_int_validator("total_size")
+    )
+
+    _extract_header_size = field_validator("header_size", **FIELD_VALIDATOR_KWARGS)(
+        _create_cast_int_validator("header_size")
+    )
 
     _extract_timeout = field_validator("timeout", **FIELD_VALIDATOR_KWARGS)(cast_float)
 
