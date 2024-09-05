@@ -17,8 +17,10 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-import base64
-import json
+# import base64
+# import json
+import pybase64 as base64
+import ujson as json
 import sys
 import warnings
 
@@ -45,9 +47,10 @@ except ImportError:
 
 
 import bittensor
-from typing import Optional, Any, Dict, ClassVar, Tuple
+from typing import Optional, Any, Dict, ClassVar, Tuple, List
 
 #  All hacky backwards compatibility stuff
+PDNTCVERSION = 1
 if not hasattr(BaseModel, "model_dump"):
     setattr(BaseModel, "model_dump", getattr(BaseModel, "dict"))
 if not hasattr(BaseModel, "model_copy"):
@@ -57,6 +60,7 @@ if not hasattr(BaseModel, "model_dump_json"):
     BACK_COMPAT_KWARGS = {"allow_mutation": True}
 else:
     BACK_COMPAT_KWARGS = {"frozen": False}
+    PDNTCVERSION = 2
 
 
 def get_size(obj, seen=None) -> int:
@@ -505,7 +509,17 @@ class Synapse(BaseModel):
         **{k: not v for k, v in BACK_COMPAT_KWARGS.items() if k != "allow_mutation"},
     )
 
-    required_hash_fields: ClassVar[Tuple[str, ...]] = ()
+    if PDNTCVERSION > 1:
+        required_hash_fields: ClassVar[Tuple[str, ...]] = ()
+    else:
+        required_hash_fields: Optional[List[str]] = Field(
+            title="required_hash_fields",
+            description="The list of required fields to compute the body hash.",
+            examples=["roles", "messages"],
+            default=[],
+            allow_mutation=False,
+            repr=False,
+        )
 
     _extract_total_size = field_validator("total_size", **FIELD_VALIDATOR_KWARGS)(cast_int)
 
