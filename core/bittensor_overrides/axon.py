@@ -980,8 +980,6 @@ class AxonMiddleware(BaseHTTPMiddleware):
         """
         # Records the start time of the request processing.
         start_time = time.time()
-        precision_start_time = time.perf_counter()
-
         try:
             # Set up the synapse from its headers.
             synapse: bittensor.Synapse = await self.preprocess(request)
@@ -1060,19 +1058,8 @@ class AxonMiddleware(BaseHTTPMiddleware):
             # Log the details of the processed synapse, including total size, name, hotkey, IP, port,
             # status code, and status message, using the debug level of the logger.
 
-            process_time = time.perf_counter() - precision_start_time
-            task_name = get_task_from_synapse(synapse)
-            # TODO: Remove try/except if you never see the error logged.
-            try:
-                task_name = (
-                    task_name
-                    if task_name is not None
-                    else getattr(synapse, "model", getattr(synapse, "engine", "[Unknown Engine/Model]"))
-                )
-            except Exception:
-                bittensor.logging.error(
-                    "Failed to get task name from synapse, Apparently __getattr__  is not supported on synapse Objects!."
-                )
+            process_time = time.time() - start_time
+            task_name = getattr(synapse, "model", getattr(synapse, "engine", request.url.path))
             logging_sentence = (
                 f"{request.method} {request.url.path} took {process_time:.6f} seconds to run for '{task_name}'!"
             )
