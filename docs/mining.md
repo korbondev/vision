@@ -8,11 +8,11 @@ Welcome to S19 Mining 🔥
 - [Worker server setup](#worker-server-setup)
 - [Proxy server setup](#proxy-server-setup)
 - [LLM server configs](#model-configs)
-- [Recommended compute](../recommended-compute)
+- [Recommended compute](../recommended-compute.md)
 
 
 # Overview
-A miner consists of serveral parts, fitting into two categories:
+A miner consists of several parts, fitting into two categories:
 
 - Proxy
 - Workers
@@ -28,7 +28,7 @@ I would advise starting with the worker servers. The simplest way to get started
 # Worker server setup
 I recommend using bare metal where possible. The documentation for bare metal can be found in here https://github.com/namoray/vision-workers
 
-Below is the documentation for a template provder, such as runpod:
+Below is the documentation for a template provider, such as runpod:
 
 **⚠️USE 11.8 <= CUDA <=12.2 For an easier life! ⚠️**
 
@@ -74,7 +74,7 @@ NOTE DONT USE THE TEMPLATE BELOW, ITS JUST AN EXAMPLE :D
 
 
 ## Image worker
-Very similar steps, just a slightly different template! 
+Very similar steps, just a slightly different template!
 
 For detailed info on setup; read this [image_server_docs](https://github.com/namoray/vision-workers/blob/main/image_server/README.md)
 ![Image server template](images/image-server-template.png)
