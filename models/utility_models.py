@@ -9,7 +9,14 @@ from core import Task
 from validation.models import axon_uid
 
 
-class QueryResult(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class QueryResult(SCBaseModel):
     formatted_response: Any
     axon_uid: Optional[int]
     miner_hotkey: Optional[str]
@@ -38,7 +45,7 @@ class Role(str, enum.Enum):
     system = "system"
 
 
-class Message(BaseModel):
+class Message(SCBaseModel):
     role: Role = Role.user
     content: str = "Remind me that I have forgot to set the messages"
 
@@ -46,7 +53,7 @@ class Message(BaseModel):
         extra = "allow"
 
 
-class UIDinfo(BaseModel):
+class UIDinfo(SCBaseModel):
     class Config:
         arbitrary_types_allowed = True
 
@@ -55,7 +62,7 @@ class UIDinfo(BaseModel):
     axon: bt.chain_data.AxonInfo
 
 
-class OperationDistribution(BaseModel):
+class OperationDistribution(SCBaseModel):
     available_axons: List[int]
     probabilities: List[float]
     score_discounts: Dict[int, float]
@@ -73,20 +80,20 @@ class EngineEnum(str, enum.Enum):
     FLUX = "flux-schnell"
 
 
-class ImageHashes(BaseModel):
+class ImageHashes(SCBaseModel):
     average_hash: str = ""
     perceptual_hash: str = ""
     difference_hash: str = ""
     color_hash: str = ""
 
 
-class ImageResponseBody(BaseModel):
+class ImageResponseBody(SCBaseModel):
     image_b64: Optional[str] = None
     is_nsfw: Optional[bool] = None
     clip_embeddings: Optional[List[float]] = None
     image_hashes: Optional[ImageHashes] = None
 
 
-class MinerChatResponse(BaseModel):
+class MinerChatResponse(SCBaseModel):
     text: str
     logprob: float

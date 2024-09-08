@@ -81,8 +81,14 @@ ALLOWED_PARAMS_FOR_ENGINE = {
     },
 }
 
-
-class TextToImageRequest(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class TextToImageRequest(SCBaseModel):
     """Generate an image from text!"""
 
     cfg_scale: float = Field(cst.DEFAULT_CFG_SCALE, description="Scale for the configuration", ge=0.1, le=10)
@@ -145,7 +151,7 @@ class TextToImageRequest(BaseModel):
         return values
 
 
-class ImageToImageRequest(BaseModel):
+class ImageToImageRequest(SCBaseModel):
     """Generate an image from another image (+ text)!"""
 
     class Config:
@@ -197,7 +203,7 @@ class ImageToImageRequest(BaseModel):
         return values
 
 
-class AvatarRequest(BaseModel):
+class AvatarRequest(SCBaseModel):
     class Config:
         use_enum_values = True
 
@@ -210,7 +216,7 @@ class AvatarRequest(BaseModel):
     steps: int = Field(15, description="Number of steps in the image generation process")
 
 
-class InpaintRequest(BaseModel):
+class InpaintRequest(SCBaseModel):
     class Config:
         use_enum_values = True
 
@@ -229,7 +235,7 @@ class InpaintRequest(BaseModel):
         return values
 
 
-# class ScribbleRequest(BaseModel):
+# class ScribbleRequest(SCBaseModel):
 #     """Generate an image from a doodle (+ text)!
 
 #     Supports model with various allowed parameters. Models:
@@ -291,7 +297,7 @@ class InpaintRequest(BaseModel):
 #         return values
 
 
-class ChatRequest(BaseModel):
+class ChatRequest(SCBaseModel):
     messages: list[utility_models.Message] = Field(...)
     temperature: float = Field(
         default=..., title="Temperature", description="Temperature for text generation.", ge=0.1, le=1.0
@@ -308,11 +314,11 @@ class ChatRequest(BaseModel):
     max_tokens: int = Field(500, title="Max Tokens", description="Max tokens for text generation.")
 
 
-class UpscaleRequest(BaseModel):
+class UpscaleRequest(SCBaseModel):
     image: str = Field(..., description="The base64 encoded image", title="image")
 
 
-class ClipEmbeddingsRequest(BaseModel):
+class ClipEmbeddingsRequest(SCBaseModel):
     image_b64s: List[str] = Field(
         None,
         description="The image b64s",
@@ -320,29 +326,29 @@ class ClipEmbeddingsRequest(BaseModel):
     )
 
 
-class TextToImageResponse(BaseModel):
+class TextToImageResponse(SCBaseModel):
     image_b64: str = Field(..., description="The base64 encoded images to return", title="image_b64")
 
 
-class ImageToImageResponse(BaseModel):
+class ImageToImageResponse(SCBaseModel):
     image_b64: str = Field(..., description="The base64 encoded images to return", title="image_b64")
 
 
-class InpaintResponse(BaseModel):
+class InpaintResponse(SCBaseModel):
     image_b64: str = Field(..., description="The base64 encoded images to return", title="image_b64")
 
 
-class AvatarResponse(BaseModel):
+class AvatarResponse(SCBaseModel):
     image_b64: str = Field(..., description="The base64 encoded images to return", title="image_b64")
 
 
-class ScribbleResponse(BaseModel):
+class ScribbleResponse(SCBaseModel):
     image_b64: str = Field(..., description="The base64 encoded images to return", title="image_b64")
 
 
-class UpscaleResponse(BaseModel):
+class UpscaleResponse(SCBaseModel):
     image_b64: str = Field(..., description="The base64 encoded images to return", title="image_b64")
 
 
-class ClipEmbeddingsResponse(BaseModel):
+class ClipEmbeddingsResponse(SCBaseModel):
     clip_embeddings: List[List[float]] = Field(..., description="The image embeddings", title="clip_embeddings")

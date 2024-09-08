@@ -72,19 +72,26 @@ class RewardDataPostBody(RewardData):
     testnet: bool
 
 
-class ValidatorInfoPostBody(BaseModel):
+from functools import lru_cache
+class SCBaseModel(SCBaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class ValidatorInfoPostBody(SCBaseModel):
     versions: str
     validator_hotkey: str
 
 
-class MinerCapacitiesPostObject(BaseModel):
+class MinerCapacitiesPostObject(SCBaseModel):
     validator_hotkey: str
     miner_hotkey: str
     task: Task
     volume: float
 
 
-class MinerCapacitiesPostBody(BaseModel):
+class MinerCapacitiesPostBody(SCBaseModel):
     data: List[MinerCapacitiesPostObject]
 
     def dump(self):
@@ -99,7 +106,7 @@ class MinerCapacitiesPostBody(BaseModel):
         ]
 
 
-class UidRecordPostObject(BaseModel):
+class UidRecordPostObject(SCBaseModel):
     axon_uid: int
     miner_hotkey: str
     validator_hotkey: str
@@ -126,7 +133,7 @@ class UidRecordPostObject(BaseModel):
         }
 
 
-class UidRecordsPostBody(BaseModel):
+class UidRecordsPostBody(SCBaseModel):
     data: List[UidRecordPostObject]
 
     def dump(self):

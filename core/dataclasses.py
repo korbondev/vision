@@ -3,8 +3,14 @@ from typing import Optional
 from bittensor.chain_data import AxonInfo
 from pydantic import BaseModel
 
-
-class Model(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class Model(SCBaseModel):
     class Config:
         arbitrary_types_allowed = True
 
@@ -18,6 +24,6 @@ class Axon(Model):
     bt_axon: AxonInfo
 
 
-class TextPrompt(BaseModel):
+class TextPrompt(SCBaseModel):
     text: str
     weight: Optional[float]

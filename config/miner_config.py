@@ -24,8 +24,14 @@ if not os.path.exists(env_file):
     bt.logging.error(f"Could not find env file: {env_file}")
 load_dotenv(env_file, verbose=True)
 
-
-class Config(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class Config(SCBaseModel):
     hotkey_name: str = os.getenv(core_cst.HOTKEY_PARAM, "default")
     wallet_name: str = os.getenv(core_cst.WALLET_NAME_PARAM, "default")
 
