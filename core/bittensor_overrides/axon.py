@@ -55,7 +55,6 @@ from bittensor.errors import (
 from config.miner_config import config as miner_config
 from core.tasks import get_task_from_synapse
 
-
 IS_TESTNET = miner_config.subtensor_network == "test"
 
 
@@ -1058,14 +1057,14 @@ class AxonMiddleware(BaseHTTPMiddleware):
             # Log the details of the processed synapse, including total size, name, hotkey, IP, port,
             # status code, and status message, using the debug level of the logger.
 
-            process_time = time.time() - start_time
-            task_name = getattr(synapse, "model", getattr(synapse, "engine", request.url.path))
+            task = get_task_from_synapse(synapse)
+            task_value = task.value if task is not None else request.url.path
             logging_sentence = (
-                f"{request.method} {request.url.path} took {process_time:.6f} seconds to run for '{task_name}'!"
+                f"{request.method} {request.url.path} took {synapse.axon.process_time:.6f} seconds to run for '{task_value}'!"
             )
 
             bittensor.logging.debug(
-                f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message} || Custom message: {logging_sentence} "
+                f"axon     | --> | {response.headers.get('content-length', -1)} B | {synapse.name} | {synapse.dendrite.hotkey} | {synapse.dendrite.ip}:{synapse.dendrite.port}  | {synapse.axon.status_code} | {synapse.axon.status_message} || {logging_sentence} "
             )
 
             # Return the response to the requester.
