@@ -12,14 +12,21 @@ task_data = defaultdict(lambda: defaultdict(list))
 axon_uid = int
 
 
-class PeriodScore(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class PeriodScore(SCBaseModel):
     hotkey: str
     period_score: Optional[float]
     consumed_volume: float
     created_at: datetime
 
 
-class UIDRecord(BaseModel):
+class UIDRecord(SCBaseModel):
     class Config:
         arbitrary_types_allowed = True
         allow_mutation = True
@@ -69,7 +76,7 @@ class UIDRecord(BaseModel):
         )
 
 
-class RewardData(BaseModel):
+class RewardData(SCBaseModel):
     id: str
     task: str
     axon_uid: int

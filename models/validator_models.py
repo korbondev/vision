@@ -1,7 +1,14 @@
 from pydantic import BaseModel
 from core import Task
 
-class TaskStatsForUID(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class TaskStatsForUID(SCBaseModel):
     uid: int
     task: Task
     current_volume: float

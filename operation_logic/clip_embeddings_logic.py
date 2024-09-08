@@ -7,7 +7,14 @@ from typing import List, Optional
 from config.miner_config import config as miner_config
 
 
-class ClipEmbeddingsResponse(BaseModel):
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
+class ClipEmbeddingsResponse(SCBaseModel):
     clip_embeddings: Optional[List[List[float]]] = None
 
 

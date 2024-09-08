@@ -108,7 +108,13 @@ class TaskType(Enum):
     TEXT = "text"
     # UPSCALE = "upscale"
 
-
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
+    
 class TaskConfig(BaseModel):
     task: Task
     overhead: float

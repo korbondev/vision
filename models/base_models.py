@@ -13,8 +13,14 @@ from core import dataclasses as dc
 from models import utility_models
 import bittensor as bt
 
+from functools import lru_cache
+class SCBaseModel(BaseModel):
+    @classmethod
+    @lru_cache()
+    def get_schema(cls):
+        return cls.schema()
 
-class VolumeForTask(BaseModel):
+class VolumeForTask(SCBaseModel):
     volume: float
 
 
@@ -22,17 +28,17 @@ class BaseSynapse(bt.Synapse):
     error_message: Optional[str] = Field(None)
 
 
-class BaseOutgoing(BaseModel):
+class BaseOutgoing(SCBaseModel):
     error_message: Optional[str] = Field(None, description="The error message", title="error_message")
 
 
 # AVAILABLE OPERATIONS
 
 
-class CapacityIncoming(BaseModel): ...
+class CapacityIncoming(SCBaseModel): ...
 
 
-class CapacityOutgoing(BaseModel):
+class CapacityOutgoing(SCBaseModel):
     capacities: Optional[Dict[Task, VolumeForTask]]
 
 
@@ -42,7 +48,7 @@ class CapacityBase(CapacityIncoming, CapacityOutgoing): ...
 # Generic image gen
 
 
-class ImageGenerationBase(BaseModel):
+class ImageGenerationBase(SCBaseModel):
     cfg_scale: float = Field(cst.DEFAULT_CFG_SCALE, description="Scale for the configuration")
     steps: int = Field(cst.DEFAULT_STEPS, description="Number of steps in the image generation process")
     seed: int = Field(
@@ -100,7 +106,7 @@ class ImageToImageBase(ImageToImageIncoming, ImageToImageOutgoing): ...
 # Inpaint
 
 
-class InpaintIncoming(BaseModel):
+class InpaintIncoming(SCBaseModel):
     seed: int = Field(..., description="Random seed for generating the image")
     steps: int = Field(8, description="Number of steps in the image generation process")
     cfg_scale: float = Field(3.0, description="Scale for the configuration")
@@ -120,7 +126,7 @@ class InpaintOutgoing(ImageResponseBase): ...
 class InpaintBase(InpaintIncoming, InpaintOutgoing): ...
 
 
-class AvatarIncoming(BaseModel):
+class AvatarIncoming(SCBaseModel):
     text_prompts: List[dc.TextPrompt] = Field(..., description="Prompts for the image generation", title="text_prompts")
     init_image: Optional[str] = Field(..., description="The base64 encoded image", title="image")
     ipadapter_strength: float = Field(..., description="The strength of the init image")
@@ -165,7 +171,7 @@ class AvatarBase(AvatarIncoming, AvatarOutgoing): ...
 # Upscale
 
 
-class UpscaleIncoming(BaseModel):
+class UpscaleIncoming(SCBaseModel):
     image: Optional[str] = Field(..., description="The base64 encoded image", title="image")
 
 
@@ -176,7 +182,7 @@ class UpscaleBase(UpscaleIncoming, UpscaleOutgoing): ...
 
 
 # CLIP EMBEDDINGS
-class ClipEmbeddingsIncoming(BaseModel):
+class ClipEmbeddingsIncoming(SCBaseModel):
     image_b64s: Optional[List[str]] = Field(
         None,
         description="The image b64s",
@@ -193,7 +199,7 @@ class ClipEmbeddingsOutgoing(BaseOutgoing):
 class ClipEmbeddingsBase(ClipEmbeddingsIncoming, ClipEmbeddingsOutgoing): ...
 
 
-class ChatIncoming(BaseModel):
+class ChatIncoming(SCBaseModel):
     messages: list[utility_models.Message] = Field(...)
 
     temperature: float = Field(
@@ -222,7 +228,7 @@ class ChatIncoming(BaseModel):
         use_enum_values = True
 
 
-class ChatOutgoing(BaseModel): ...
+class ChatOutgoing(SCBaseModel): ...
 
 
 class ChatBase(ChatIncoming, ChatOutgoing): ...
