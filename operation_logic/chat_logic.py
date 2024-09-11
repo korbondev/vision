@@ -32,7 +32,7 @@ async def stream_text_from_server(body: base_models.ChatIncoming, url: str, task
                         yield f"data: {data}\n\n"
                 except Exception as e:
                     bt.logging.error(f"Error in streaming text from the server: {e}. Original chunk: {chunk}\n{traceback.format_exc()}")
-        #miner_requests_stats.decrement_concurrency_group_from_task(task)
+        miner_requests_stats.decrement_concurrency_group_from_task(task)
 
 
 async def chat_logic(body: base_models.ChatIncoming, url: str, task: Task) -> AsyncGenerator:
