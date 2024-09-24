@@ -7,7 +7,7 @@ import traceback
 from typing import AsyncGenerator
 from mining.proxy.core_miner import miner_requests_stats
 
-POST_ENDPOINT = "generate_text"
+POST_ENDPOINT = "v1/chat/completions"
 
 
 async def stream_text_from_server(body: base_models.ChatIncoming, url: str, task: Task) -> AsyncGenerator:
